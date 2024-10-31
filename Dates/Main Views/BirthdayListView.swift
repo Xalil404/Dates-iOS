@@ -254,6 +254,8 @@ struct Birthday: Identifiable, Codable {
     var date: String // Use Date type if preferred
 }
 
+
+
 struct BirthdayListView_Previews: PreviewProvider {
     static var previews: some View {
         BirthdayListView()

@@ -150,7 +150,7 @@ struct LoginView: View {
 
             // Navigation Link for CRUD Birthdays Screen
             NavigationLink(
-                destination: BirthdayListView(), // Replace with your CRUD birthdays view
+                destination: MainTabView(), // Navigate to the MainTabView on successful login
                 isActive: $isLoginSuccessful
             ) {
                 EmptyView()

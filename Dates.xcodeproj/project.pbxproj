@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		5253D2152CD38E2500C25A2D /* Dates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dates.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5247446A2CD431E600ED9194 /* Dates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Dates.app; path = "/Users/test/Desktop/Dates/build/Debug-iphoneos/Dates.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				5253D2172CD38E2500C25A2D /* Dates */,
-				5253D2162CD38E2500C25A2D /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		5253D2162CD38E2500C25A2D /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				5253D2152CD38E2500C25A2D /* Dates.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -67,7 +58,7 @@
 			packageProductDependencies = (
 			);
 			productName = Dates;
-			productReference = 5253D2152CD38E2500C25A2D /* Dates.app */;
+			productReference = 5247446A2CD431E600ED9194 /* Dates.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +86,7 @@
 			mainGroup = 5253D20C2CD38E2500C25A2D;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 5253D2162CD38E2500C25A2D /* Products */;
+			productRefGroup = 5253D20C2CD38E2500C25A2D;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

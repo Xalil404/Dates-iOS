@@ -20,7 +20,7 @@ struct MainTabView: View {
                     Label("Anniversaries", systemImage: "heart")
                 }
             
-            HolidaysView()
+            HolidayListView()
                 .tabItem {
                     Label("Holidays", systemImage: "calendar")
                 }
