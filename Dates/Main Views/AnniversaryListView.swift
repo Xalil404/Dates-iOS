@@ -15,37 +15,68 @@ struct AnniversaryListView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                List {
-                    ForEach(anniversaries) { anniversary in
-                        VStack(alignment: .leading) {
-                            Text(anniversary.description)
-                                .font(.headline)
-                            Text("Date: \(anniversary.date)")
-                                .font(.subheadline)
-                        }
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                // Call deleteAnniversary with the anniversary ID
-                                if let index = anniversaries.firstIndex(where: { $0.id == anniversary.id }) {
-                                    deleteAnniversary(at: IndexSet(integer: index))
-                                }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            
-                            Button {
-                                // Handle edit anniversary here
-                                anniversaryToEdit = anniversary
-                                showAddAnniversary.toggle()
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                        }
+            ZStack(alignment: .bottom) {
+                // Check if the list is empty
+                if anniversaries.isEmpty {
+                    // Empty state UI
+                    VStack {
+                        Image("emptyState")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                            .foregroundColor(.white)
+                        
+                        Text("No Anniversaries Yet")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                            .padding(.top, 10)
+                        
+                        Text("Add your first anniversary to keep track of special dates.")
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
+                            .padding(.top, 5)
                     }
-                    .onDelete(perform: deleteAnniversary) // This now accepts IndexSet
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(red: 248/255, green: 247/255, blue: 245/255))
+                    .edgesIgnoringSafeArea(.all)
+                } else {
+                    // List of anniversaries
+                    List {
+                        ForEach(anniversaries) { anniversary in
+                            VStack(alignment: .leading) {
+                                Text(anniversary.description)
+                                    .font(.headline)
+                                Text("Date: \(anniversary.date)")
+                                    .font(.subheadline)
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    // Call deleteAnniversary with the anniversary ID
+                                    if let index = anniversaries.firstIndex(where: { $0.id == anniversary.id }) {
+                                        deleteAnniversary(at: IndexSet(integer: index))
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                
+                                Button {
+                                    // Handle edit anniversary here
+                                    anniversaryToEdit = anniversary
+                                    showAddAnniversary.toggle()
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                            }
+                        }
+                        .onDelete(perform: deleteAnniversary)
+                    }
+                    .listStyle(PlainListStyle())
                 }
-                
+
+                // Add Anniversary button
                 Button(action: {
                     anniversaryToEdit = nil // Reset for adding a new anniversary
                     showAddAnniversary.toggle()
@@ -53,11 +84,14 @@ struct AnniversaryListView: View {
                     Text("Add Anniversary")
                         .fontWeight(.bold)
                         .padding()
-                        .background(Color.blue)
+                        .frame(maxWidth: .infinity)
+                        .background(Color(red: 232/255, green: 191/255, blue: 115/255))
                         .foregroundColor(.white)
                         .cornerRadius(10)
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
                 }
-                .padding()
+                .shadow(radius: 5)
             }
             .navigationTitle("Anniversaries")
             .navigationBarTitleDisplayMode(.inline)
@@ -81,10 +115,14 @@ struct AnniversaryListView: View {
             )) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
-            
         }
+        .background(Color.clear)
     }
 
+
+
+/* Ui is above; below are the functions */
+    
     func fetchAnniversaries() {
         guard let token = UserDefaults.standard.string(forKey: "authToken"),
               let url = URL(string: "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/api/anniversaries/") else { return }
@@ -252,10 +290,9 @@ struct Anniversary: Identifiable, Codable {
     var date: String // Use Date type if preferred
 }
 
+
 struct AnniversaryListView_Previews: PreviewProvider {
     static var previews: some View {
         AnniversaryListView()
     }
 }
-
-       

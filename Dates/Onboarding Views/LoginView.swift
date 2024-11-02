@@ -4,37 +4,38 @@
 //
 //  Created by TEST on 31.10.2024.
 //
+
 import SwiftUI
 
 struct LoginView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State private var email: String = "" // State variable for email
-    @State private var password: String = "" // State variable for password
-    @State private var loginError: String? // State variable for storing login error messages
-    @State private var isLoading: Bool = false // State variable to manage loading state
-    @State private var isLoginSuccessful: Bool = false // State variable to trigger navigation
+    @State private var email: String = ""
+    @State private var password: String = ""
+    @State private var loginError: String?
+    @State private var isLoading: Bool = false
+    @State private var isLoginSuccessful: Bool = false
 
     var body: some View {
         VStack {
             // Custom Back Button
             HStack {
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss() // Navigate back if necessary
+                    presentationMode.wrappedValue.dismiss()
                 }) {
-                    Image(systemName: "arrow.left") // Back arrow icon
+                    Image(systemName: "arrow.left")
                         .font(.title)
                         .foregroundColor(.black)
                 }
                 Spacer()
             }
-            .padding(.top, 50) // Adjust position as needed
+            .padding(.top, 50)
             .padding(.horizontal)
 
             // Main Image
-            Image("loginImage") // Add your image asset here
+            Image("loginImage")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 350, height: 350) // Adjust size as needed
+                .frame(width: 350, height: 350)
 
             // Title
             Text("Login")
@@ -45,37 +46,37 @@ struct LoginView: View {
             // Email Input Field
             VStack(spacing: 0) {
                 HStack {
-                    Image(systemName: "at") // Email icon
+                    Image(systemName: "at")
                         .foregroundColor(.gray)
                         .padding(.leading, 10)
 
-                    TextField("Email", text: $email) // Bind email state
+                    TextField("Email", text: $email)
                         .padding(10)
-                        .background(Color.clear) // Clear background
-                        .autocapitalization(.none) // Prevent autocapitalization
+                        .background(Color.clear)
+                        .autocapitalization(.none)
                 }
 
-                Rectangle() // Bottom border
-                    .frame(width: 280, height: 1) // Border height
-                    .foregroundColor(Color.gray) // Border color
+                Rectangle()
+                    .frame(width: 280, height: 1)
+                    .foregroundColor(Color.gray)
             }
             .padding(.horizontal)
 
             // Password Input Field
             VStack(spacing: 0) {
                 HStack {
-                    Image(systemName: "lock") // Password icon
+                    Image(systemName: "lock")
                         .foregroundColor(.gray)
                         .padding(.leading, 10)
 
-                    SecureField("Password", text: $password) // Bind password state
+                    SecureField("Password", text: $password)
                         .padding(10)
-                        .background(Color.clear) // Clear background
+                        .background(Color.clear)
                 }
 
-                Rectangle() // Bottom border
-                    .frame(width: 280, height: 1) // Border height
-                    .foregroundColor(Color.gray) // Border color
+                Rectangle()
+                    .frame(width: 280, height: 1)
+                    .foregroundColor(Color.gray)
             }
             .padding(.horizontal)
 
@@ -94,7 +95,6 @@ struct LoginView: View {
 
             // Continue Button
             Button(action: {
-                // Handle login action here
                 loginUser(email: email, password: password)
             }) {
                 Text("Continue")
@@ -111,16 +111,16 @@ struct LoginView: View {
             // Divider
             HStack {
                 Divider()
-                    .frame(maxWidth: .infinity) // Makes the divider stretch horizontally
-                    .frame(height: 1) // Height of the line
-                    .background(Color.gray) // Optional: Set the line color
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 1)
+                    .background(Color.gray)
                 Text("or")
                     .foregroundColor(.gray)
-                    .padding(.horizontal) // Add horizontal padding for spacing
+                    .padding(.horizontal)
                 Divider()
-                    .frame(maxWidth: .infinity) // Makes the divider stretch horizontally
-                    .frame(height: 1) // Height of the line
-                    .background(Color.gray) // Optional: Set the line color
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 1)
+                    .background(Color.gray)
             }
             .padding(.vertical)
             .padding(.horizontal, 40)
@@ -130,7 +130,7 @@ struct LoginView: View {
                 // Handle Google login action here
             }) {
                 HStack {
-                    Image("googleIcon") // Add your Google icon asset here
+                    Image("googleIcon")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
@@ -150,36 +150,38 @@ struct LoginView: View {
 
             // Navigation Link for CRUD Birthdays Screen
             NavigationLink(
-                destination: MainTabView(), // Navigate to the MainTabView on successful login
+                destination: MainTabView(),
                 isActive: $isLoginSuccessful
             ) {
                 EmptyView()
             }
         }
-        .background(Color(red: 248/255, green: 247/255, blue: 245/255)) // Set background color
+        .background(Color(red: 248/255, green: 247/255, blue: 245/255))
         .edgesIgnoringSafeArea(.all)
-        .navigationBarBackButtonHidden(true) // Hide the default back button, although it shouldn't appear now
+        .navigationBarBackButtonHidden(true)
+        .onAppear {
+            // Check if user is already logged in
+            if UserDefaults.standard.bool(forKey: "isLoggedIn") {
+                self.isLoginSuccessful = true
+            }
+        }
     }
+    
+    /* Ui is above; below are the functions */
 
     // Function to handle user login
     private func loginUser(email: String, password: String) {
-        // Ensure inputs are not empty
         guard !email.isEmpty, !password.isEmpty else {
             loginError = "Email and password cannot be empty."
             return
         }
 
-        // Set loading state
         isLoading = true
-        loginError = nil // Reset error message
+        loginError = nil
 
-        // Prepare the credentials for API call
         let credentials = ["email": email, "password": password]
-
-        // API URL for login
         let loginUrl = "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/auth/login/"
 
-        // Make the API call
         guard let url = URL(string: loginUrl) else { return }
         
         var request = URLRequest(url: url)
@@ -212,15 +214,14 @@ struct LoginView: View {
             }
 
             do {
-                // Attempt to decode the response
                 let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                 if let dict = jsonResponse as? [String: Any], let token = dict["key"] as? String {
-                    // Login successful, save the token or user info
-                    UserDefaults.standard.set(token, forKey: "authToken") // Store token for later use
+                    // Login successful, save the token and login state
+                    UserDefaults.standard.set(token, forKey: "authToken")
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
                     DispatchQueue.main.async {
-                        print("Login successful! Token: \(token)")
                         self.isLoading = false
-                        self.isLoginSuccessful = true // Trigger navigation
+                        self.isLoginSuccessful = true
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -236,7 +237,7 @@ struct LoginView: View {
             }
         }
         
-        task.resume() // Start the network task
+        task.resume()
     }
 }
 
@@ -245,3 +246,5 @@ struct LoginView_Previews: PreviewProvider {
         LoginView()
     }
 }
+
+

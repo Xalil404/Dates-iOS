@@ -22,37 +22,68 @@ struct HolidayListView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                List {
-                    ForEach(holidays) { holiday in
-                        VStack(alignment: .leading) {
-                            Text(holiday.description)
-                                .font(.headline)
-                            Text("Date: \(holiday.month)/\(holiday.day)")
-                                .font(.subheadline)
-                        }
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                // Call deleteHoliday with the holiday ID
-                                if let index = holidays.firstIndex(where: { $0.id == holiday.id }) {
-                                    deleteHoliday(at: IndexSet(integer: index))
-                                }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            
-                            Button {
-                                // Handle edit holiday here
-                                holidayToEdit = holiday
-                                showAddHoliday.toggle()
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                        }
+            ZStack(alignment: .bottom) {
+                // Check if the list is empty
+                if holidays.isEmpty {
+                    // Empty state UI
+                    VStack {
+                        Image("emptyState")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                            .foregroundColor(.white)
+                        
+                        Text("No Holidays Yet")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                            .padding(.top, 10)
+                        
+                        Text("Add your first holiday to keep track of important dates.")
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
+                            .padding(.top, 5)
                     }
-                    .onDelete(perform: deleteHoliday)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(red: 248/255, green: 247/255, blue: 245/255))
+                    .edgesIgnoringSafeArea(.all)
+                } else {
+                    // List of holidays
+                    List {
+                        ForEach(holidays) { holiday in
+                            VStack(alignment: .leading) {
+                                Text(holiday.description)
+                                    .font(.headline)
+                                Text("Date: \(holiday.month)/\(holiday.day)")
+                                    .font(.subheadline)
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    // Call deleteHoliday with the holiday ID
+                                    if let index = holidays.firstIndex(where: { $0.id == holiday.id }) {
+                                        deleteHoliday(at: IndexSet(integer: index))
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                
+                                Button {
+                                    // Handle edit holiday here
+                                    holidayToEdit = holiday
+                                    showAddHoliday.toggle()
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                            }
+                        }
+                        .onDelete(perform: deleteHoliday)
+                    }
+                    .listStyle(PlainListStyle())
                 }
-                
+
+                // Add Holiday button
                 Button(action: {
                     holidayToEdit = nil // Reset for adding a new holiday
                     showAddHoliday.toggle()
@@ -60,11 +91,14 @@ struct HolidayListView: View {
                     Text("Add Holiday")
                         .fontWeight(.bold)
                         .padding()
-                        .background(Color.blue)
+                        .frame(maxWidth: .infinity)
+                        .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Update color to match anniversaries button
                         .foregroundColor(.white)
                         .cornerRadius(10)
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
                 }
-                .padding()
+                .shadow(radius: 5)
             }
             .navigationTitle("Holidays")
             .navigationBarTitleDisplayMode(.inline)
@@ -88,10 +122,13 @@ struct HolidayListView: View {
             )) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
-            
         }
+        .background(Color.clear)
     }
 
+
+
+    /* Ui is above; below are the functions */
     func fetchHolidays() {
         guard let token = UserDefaults.standard.string(forKey: "authToken"),
               let url = URL(string: "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/api/holidays/") else { return }

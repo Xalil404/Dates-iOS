@@ -38,7 +38,6 @@ struct ProfileView: View {
                 
                 // Logout Button
                 Button(action: {
-                    // Handle logout action here
                     logout() // Call logout function
                 }) {
                     Text("Log Out")
@@ -67,8 +66,11 @@ struct ProfileView: View {
     }
     
     private func logout() {
-        // Perform any necessary logout logic here (e.g., clearing user data)
-        // After logging out, update the state to present the login view
+        // Clear the authentication token from UserDefaults
+        UserDefaults.standard.removeObject(forKey: "authToken")
+        
+        // Reset the user data and navigate to the login screen
+        user = nil
         isLoggedOut = true
     }
 
@@ -106,6 +108,7 @@ struct ProfileView: View {
         }.resume()
     }
 }
+
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {

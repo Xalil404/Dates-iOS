@@ -13,10 +13,36 @@ struct BirthdayListView: View {
     @State private var errorMessage: String = ""
     
     var body: some View {
-        TabView {
-            
-            NavigationView {
-                VStack {
+        NavigationView {
+            ZStack(alignment: .bottom) {
+                // Check if the list is empty
+                if birthdays.isEmpty {
+                    // Empty state UI
+                    VStack {
+                        Image("emptyState")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                            .foregroundColor(.white)
+                        
+                        Text("No Birthdays Yet")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                            .padding(.top, 10)
+                        
+                        Text("Add your first birthday to remember special dates.")
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
+                            .padding(.top, 5)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(red: 248/255, green: 247/255, blue: 245/255))
+                    .edgesIgnoringSafeArea(.all)
+                } else {
+                    // List of birthdays
                     List {
                         ForEach(birthdays) { birthday in
                             VStack(alignment: .leading) {
@@ -44,48 +70,59 @@ struct BirthdayListView: View {
                                 }
                             }
                         }
-                        .onDelete(perform: deleteBirthday) // This now accepts IndexSet
+                        .onDelete(perform: deleteBirthday)
                     }
-                    
-                    Button(action: {
-                        birthdayToEdit = nil // Reset for adding a new birthday
-                        showAddBirthday.toggle()
-                    }) {
-                        Text("Add Birthday")
-                            .fontWeight(.bold)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                    .listStyle(PlainListStyle())
+                }
+
+                // Add Birthday button
+                Button(action: {
+                    birthdayToEdit = nil // Reset for adding a new birthday
+                    showAddBirthday.toggle()
+                }) {
+                    Text("Add Birthday")
+                        .fontWeight(.bold)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Update to match the anniversaries button color
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
+                }
+                .shadow(radius: 5)
+            }
+            .navigationTitle("Birthdays")
+            .navigationBarTitleDisplayMode(.inline)
+            
+            .sheet(isPresented: $showAddBirthday) {
+                if let selectedBirthday = birthdayToEdit {
+                    AddBirthdayView(birthday: selectedBirthday) { updatedBirthday in
+                        updateBirthday(birthday: updatedBirthday)
                     }
-                    .padding()
-                }
-                .navigationTitle("Birthdays")
-                .navigationBarTitleDisplayMode(.inline)
-                .sheet(isPresented: $showAddBirthday) {
-                    if let selectedBirthday = birthdayToEdit {
-                        AddBirthdayView(birthday: selectedBirthday) { updatedBirthday in
-                            updateBirthday(birthday: updatedBirthday)
-                        }
-                    } else {
-                        AddBirthdayView { newBirthday in
-                            addBirthday(birthday: newBirthday)
-                        }
+                } else {
+                    AddBirthdayView { newBirthday in
+                        addBirthday(birthday: newBirthday)
                     }
                 }
-                .onAppear {
-                    fetchBirthdays()
-                }
-                .alert(isPresented: Binding<Bool>(
-                    get: { !errorMessage.isEmpty },
-                    set: { if !$0 { errorMessage = "" }}
-                )) {
-                    Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
-                }
+            }
+            .onAppear {
+                fetchBirthdays()
+            }
+            .alert(isPresented: Binding<Bool>(
+                get: { !errorMessage.isEmpty },
+                set: { if !$0 { errorMessage = "" }}
+            )) {
+                Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
                 
             }
         }
+        .background(Color.clear)
     }
+
+
+    
+    /* Ui is above; below are the functions */
 
     func fetchBirthdays() {
         guard let token = UserDefaults.standard.string(forKey: "authToken"),
