@@ -15,56 +15,70 @@ struct ProfileView: View {
     @State private var errorMessage: String = "" // State variable to hold error messages
 
     var body: some View {
-        NavigationView {
-            VStack {
-                if isLoading {
-                    Text("Loading user information...")
-                        .font(.headline)
-                        .padding()
-                } else if let user = user {
-                    Text("Profile")
-                        .font(.largeTitle)
-                        .padding()
-                    Text("Username: \(user.username)") // Display the username
-                        .font(.subheadline)
-                        .padding()
-                } else {
-                    Text("Failed to load user information")
-                        .font(.subheadline)
-                        .padding()
+            NavigationView {
+                VStack {
+                    if isLoading {
+                        Text("Loading user information...")
+                            .font(.headline)
+                            .padding()
+                    } else if let user = user {
+                        // Circular profile image
+                        Image("defaultProfileImage") // Replace with your image name or use a system image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 100)
+                            .clipShape(Circle())
+                            .padding(.bottom, 10)
+                        
+                        Text("Profile")
+                            .font(.largeTitle)
+                            .padding()
+                        Text("Username: \(user.username)") // Display the username
+                            .font(.subheadline)
+                            .padding()
+                    } else {
+                        Text("Failed to load user information")
+                            .font(.subheadline)
+                            .padding()
+                    }
+                    
+                    Spacer()
+                    
+                    // Logout Button
+                    Button(action: {
+                        logout() // Call logout function
+                    }) {
+                        Text("Log Out")
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity) // Make the button full width
+                            .background(Color.red)
+                            .cornerRadius(8)
+                    }
+                    .padding(.top, 20)
+                    .padding(.horizontal) // Add horizontal padding
+                    
                 }
-                
-                Spacer()
-                
-                // Logout Button
-                Button(action: {
-                    logout() // Call logout function
-                }) {
-                    Text("Log Out")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.red)
-                        .cornerRadius(8)
+                .padding()
+                .background(Color(red: 248/255, green: 247/255, blue: 245/255)) // Set background color
+                .navigationTitle("Profile")
+                .navigationBarTitleDisplayMode(.inline)
+                .fullScreenCover(isPresented: $isLoggedOut) {
+                    LoginView() // Replace with your actual login view
                 }
-                .padding(.top, 20)
-            }
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(isPresented: $isLoggedOut) {
-                LoginView() // Replace with your actual login view
-            }
-            .onAppear {
-                fetchUserProfile() // Fetch user data when the view appears
-            }
-            .alert(isPresented: Binding<Bool>(
-                get: { !errorMessage.isEmpty },
-                set: { if !$0 { errorMessage = "" }}
-            )) {
-                Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+                .onAppear {
+                    fetchUserProfile() // Fetch user data when the view appears
+                }
+                .alert(isPresented: Binding<Bool>(
+                    get: { !errorMessage.isEmpty },
+                    set: { if !$0 { errorMessage = "" }}
+                )) {
+                    Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+                }
             }
         }
-    }
     
+    /* UI is above; below are the functions */
     private func logout() {
         // Clear the authentication token from UserDefaults
         UserDefaults.standard.removeObject(forKey: "authToken")
