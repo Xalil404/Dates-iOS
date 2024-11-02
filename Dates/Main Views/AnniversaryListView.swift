@@ -97,15 +97,17 @@ struct AnniversaryListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showAddAnniversary) {
                 if let selectedAnniversary = anniversaryToEdit {
-                    AddAnniversaryView(anniversary: selectedAnniversary) { updatedAnniversary in
+                    AddAnniversaryView(onAddAnniversary: { updatedAnniversary in
                         updateAnniversary(anniversary: updatedAnniversary)
-                    }
+                    }, anniversary: selectedAnniversary)
                 } else {
-                    AddAnniversaryView { newAnniversary in
+                    AddAnniversaryView(onAddAnniversary: { newAnniversary in
                         addAnniversary(anniversary: newAnniversary)
-                    }
+                    })
                 }
             }
+
+
             .onAppear {
                 fetchAnniversaries()
             }

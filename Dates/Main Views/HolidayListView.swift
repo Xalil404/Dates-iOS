@@ -104,15 +104,16 @@ struct HolidayListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showAddHoliday) {
                 if let selectedHoliday = holidayToEdit {
-                    AddHolidayView(holiday: selectedHoliday) { updatedHoliday in
+                    AddHolidayView(onAddHoliday: { updatedHoliday in
                         updateHoliday(holiday: updatedHoliday)
-                    }
+                    }, holiday: selectedHoliday)
                 } else {
-                    AddHolidayView { newHoliday in
+                    AddHolidayView(onAddHoliday: { newHoliday in
                         addHoliday(holiday: newHoliday)
-                    }
+                    })
                 }
             }
+
             .onAppear {
                 fetchHolidays()
             }

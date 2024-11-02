@@ -97,15 +97,16 @@ struct BirthdayListView: View {
             
             .sheet(isPresented: $showAddBirthday) {
                 if let selectedBirthday = birthdayToEdit {
-                    AddBirthdayView(birthday: selectedBirthday) { updatedBirthday in
+                    AddBirthdayView(onAddBirthday: { updatedBirthday in
                         updateBirthday(birthday: updatedBirthday)
-                    }
+                    }, birthday: selectedBirthday)
                 } else {
-                    AddBirthdayView { newBirthday in
+                    AddBirthdayView(onAddBirthday: { newBirthday in
                         addBirthday(birthday: newBirthday)
-                    }
+                    })
                 }
             }
+
             .onAppear {
                 fetchBirthdays()
             }

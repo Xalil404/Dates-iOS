@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		523A7D612CD4DFB400186045 /* Dates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Dates.app; path = "/Users/test/Desktop/Dates/build/Debug-iphoneos/Dates.app"; sourceTree = "<absolute>"; };
+		528B18312CD6811A00CF6899 /* Dates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Dates.app; path = "/Users/test/Desktop/Dates/build/Debug-iphoneos/Dates.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -58,7 +58,7 @@
 			packageProductDependencies = (
 			);
 			productName = Dates;
-			productReference = 523A7D612CD4DFB400186045 /* Dates.app */;
+			productReference = 528B18312CD6811A00CF6899 /* Dates.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
