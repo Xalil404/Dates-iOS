@@ -16,6 +16,10 @@ struct AnniversaryListView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
+                // Set the background color here
+                Color(red: 248/255, green: 247/255, blue: 245/255) // Set background color to fill the entire screen
+                    .edgesIgnoringSafeArea(.all) // Make it fill the entire screen
+
                 // Check if the list is empty
                 if anniversaries.isEmpty {
                     // Empty state UI
@@ -40,42 +44,64 @@ struct AnniversaryListView: View {
                             .padding(.top, 5)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(red: 248/255, green: 247/255, blue: 245/255))
-                    .edgesIgnoringSafeArea(.all)
                 } else {
-                    // List of anniversaries
-                    List {
-                        ForEach(anniversaries) { anniversary in
-                            VStack(alignment: .leading) {
-                                Text(anniversary.description)
-                                    .font(.headline)
-                                Text("Date: \(anniversary.date)")
-                                    .font(.subheadline)
-                            }
-                            .swipeActions {
-                                Button(role: .destructive) {
-                                    // Call deleteAnniversary with the anniversary ID
-                                    if let index = anniversaries.firstIndex(where: { $0.id == anniversary.id }) {
-                                        deleteAnniversary(at: IndexSet(integer: index))
+                    // Stacked floating bars for each anniversary
+                    ScrollView {
+                        VStack(spacing: 20) {  // Space between each card
+                            ForEach(anniversaries) { anniversary in
+                                VStack {
+                                    HStack {
+                                        // Circular ellipsis button with menu for edit and delete
+                                        Menu {
+                                            Button("Edit") {
+                                                anniversaryToEdit = anniversary
+                                                showAddAnniversary.toggle()
+                                            }
+                                            Button(role: .destructive) {
+                                                if let index = anniversaries.firstIndex(where: { $0.id == anniversary.id }) {
+                                                    deleteAnniversary(at: IndexSet(integer: index))
+                                                }
+                                            } label: {
+                                                Text("Delete")
+                                            }
+                                        } label: {
+                                            Image(systemName: "ellipsis")
+                                                .font(.title2)
+                                                .foregroundColor(.white)
+                                                .padding(12)
+                                                .background(Color.black.opacity(0.6))
+                                                .clipShape(Circle())
+                                        }
+                                        
+                                        // Title and Date side by side
+                                        Text(anniversary.description.prefix(20) + (anniversary.description.count > 20 ? "..." : ""))
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .lineLimit(1)
+                                        
+                                        Spacer()
+                                        
+                                        Text("Date: \(anniversary.date)")
+                                            .font(.subheadline)
+                                            .foregroundColor(.black.opacity(0.7))
+                                            .fontWeight(.bold)
                                     }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                                
-                                Button {
-                                    // Handle edit anniversary here
-                                    anniversaryToEdit = anniversary
-                                    showAddAnniversary.toggle()
-                                } label: {
-                                    Label("Edit", systemImage: "pencil")
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 75) // Set consistent height
+                                    .background(Color(red: 242/255, green: 164/255, blue: 161/255)) // Peach Pink
+
+
+                                    .cornerRadius(12)
+                                    .shadow(radius: 5)
                                 }
                             }
                         }
-                        .onDelete(perform: deleteAnniversary)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
                     }
-                    .listStyle(PlainListStyle())
                 }
-
+                
                 // Add Anniversary button
                 Button(action: {
                     anniversaryToEdit = nil // Reset for adding a new anniversary
@@ -106,8 +132,6 @@ struct AnniversaryListView: View {
                     })
                 }
             }
-
-
             .onAppear {
                 fetchAnniversaries()
             }
@@ -118,8 +142,11 @@ struct AnniversaryListView: View {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
         }
-        .background(Color.clear)
     }
+
+
+
+
 
 
 

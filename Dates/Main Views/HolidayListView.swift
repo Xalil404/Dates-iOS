@@ -23,6 +23,10 @@ struct HolidayListView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
+                // Set the background color to match the anniversaries screen
+                Color(red: 248/255, green: 247/255, blue: 245/255)
+                    .edgesIgnoringSafeArea(.all) // Fill the entire screen
+
                 // Check if the list is empty
                 if holidays.isEmpty {
                     // Empty state UI
@@ -47,42 +51,62 @@ struct HolidayListView: View {
                             .padding(.top, 5)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(red: 248/255, green: 247/255, blue: 245/255))
-                    .edgesIgnoringSafeArea(.all)
                 } else {
-                    // List of holidays
-                    List {
-                        ForEach(holidays) { holiday in
-                            VStack(alignment: .leading) {
-                                Text(holiday.description)
-                                    .font(.headline)
-                                Text("Date: \(holiday.month)/\(holiday.day)")
-                                    .font(.subheadline)
-                            }
-                            .swipeActions {
-                                Button(role: .destructive) {
-                                    // Call deleteHoliday with the holiday ID
-                                    if let index = holidays.firstIndex(where: { $0.id == holiday.id }) {
-                                        deleteHoliday(at: IndexSet(integer: index))
+                    // Stacked floating bars for each holiday
+                    ScrollView {
+                        VStack(spacing: 20) {  // Space between each card
+                            ForEach(holidays) { holiday in
+                                VStack {
+                                    HStack {
+                                        // Circular ellipsis button with menu for edit and delete
+                                        Menu {
+                                            Button("Edit") {
+                                                holidayToEdit = holiday
+                                                showAddHoliday.toggle()
+                                            }
+                                            Button(role: .destructive) {
+                                                if let index = holidays.firstIndex(where: { $0.id == holiday.id }) {
+                                                    deleteHoliday(at: IndexSet(integer: index))
+                                                }
+                                            } label: {
+                                                Text("Delete")
+                                            }
+                                        } label: {
+                                            Image(systemName: "ellipsis")
+                                                .font(.title2)
+                                                .foregroundColor(.white)
+                                                .padding(12)
+                                                .background(Color.black.opacity(0.6))
+                                                .clipShape(Circle())
+                                        }
+                                        
+                                        // Title and Date side by side
+                                        Text(holiday.description.prefix(20) + (holiday.description.count > 20 ? "..." : ""))
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .lineLimit(1)
+                                        
+                                        Spacer()
+                                        
+                                        Text("Date: \(holiday.month)/\(holiday.day)")
+                                            .font(.subheadline)
+                                            .foregroundColor(.black.opacity(0.7))
+                                            .fontWeight(.bold)
                                     }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                                
-                                Button {
-                                    // Handle edit holiday here
-                                    holidayToEdit = holiday
-                                    showAddHoliday.toggle()
-                                } label: {
-                                    Label("Edit", systemImage: "pencil")
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 75) // Set consistent height
+                                    .background(Color(red: 135/255, green: 206/255, blue: 235/255)) // Sky Blue card color
+                                    .cornerRadius(12)
+                                    .shadow(radius: 5)
                                 }
                             }
                         }
-                        .onDelete(perform: deleteHoliday)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
                     }
-                    .listStyle(PlainListStyle())
                 }
-
+                
                 // Add Holiday button
                 Button(action: {
                     holidayToEdit = nil // Reset for adding a new holiday
@@ -92,7 +116,7 @@ struct HolidayListView: View {
                         .fontWeight(.bold)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Update color to match anniversaries button
+                        .background(Color(red: 232/255, green: 191/255, blue: 115/255))
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding(.horizontal)
@@ -113,7 +137,6 @@ struct HolidayListView: View {
                     })
                 }
             }
-
             .onAppear {
                 fetchHolidays()
             }
@@ -124,8 +147,8 @@ struct HolidayListView: View {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
         }
-        .background(Color.clear)
     }
+
 
 
 

@@ -15,6 +15,10 @@ struct BirthdayListView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
+                // Set the background color here
+                Color(red: 248/255, green: 247/255, blue: 245/255) // Set background color to fill the entire screen
+                    .edgesIgnoringSafeArea(.all) // Make it fill the entire screen
+
                 // Check if the list is empty
                 if birthdays.isEmpty {
                     // Empty state UI
@@ -24,13 +28,13 @@ struct BirthdayListView: View {
                             .scaledToFit()
                             .frame(width: 300, height: 300)
                             .foregroundColor(.white)
-                        
+
                         Text("No Birthdays Yet")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.black)
                             .padding(.top, 10)
-                        
+
                         Text("Add your first birthday to remember special dates.")
                             .font(.subheadline)
                             .foregroundColor(.black)
@@ -39,40 +43,60 @@ struct BirthdayListView: View {
                             .padding(.top, 5)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(red: 248/255, green: 247/255, blue: 245/255))
-                    .edgesIgnoringSafeArea(.all)
                 } else {
-                    // List of birthdays
-                    List {
-                        ForEach(birthdays) { birthday in
-                            VStack(alignment: .leading) {
-                                Text(birthday.description)
-                                    .font(.headline)
-                                Text("Date: \(birthday.date)")
-                                    .font(.subheadline)
-                            }
-                            .swipeActions {
-                                Button(role: .destructive) {
-                                    // Call deleteBirthday with the birthday ID
-                                    if let index = birthdays.firstIndex(where: { $0.id == birthday.id }) {
-                                        deleteBirthday(at: IndexSet(integer: index))
+                    // Stacked floating bars for each birthday
+                    ScrollView {
+                        VStack(spacing: 20) { // Space between each card
+                            ForEach(birthdays) { birthday in
+                                VStack {
+                                    HStack {
+                                        // Circular ellipsis button with menu for edit and delete
+                                        Menu {
+                                            Button("Edit") {
+                                                birthdayToEdit = birthday
+                                                showAddBirthday.toggle()
+                                            }
+                                            Button(role: .destructive) {
+                                                if let index = birthdays.firstIndex(where: { $0.id == birthday.id }) {
+                                                    deleteBirthday(at: IndexSet(integer: index))
+                                                }
+                                            } label: {
+                                                Text("Delete")
+                                            }
+                                        } label: {
+                                            Image(systemName: "ellipsis")
+                                                .font(.title2)
+                                                .foregroundColor(.white)
+                                                .padding(12)
+                                                .background(Color.black.opacity(0.6))
+                                                .clipShape(Circle())
+                                        }
+
+                                        // Title and Date side by side
+                                        Text(birthday.description.prefix(20) + (birthday.description.count > 20 ? "..." : ""))
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .lineLimit(1)
+
+                                        Spacer()
+
+                                        Text("Date: \(birthday.date)")
+                                            .font(.subheadline)
+                                            .foregroundColor(.black.opacity(0.7))
+                                            .fontWeight(.bold)
                                     }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                                
-                                Button {
-                                    // Handle edit birthday here
-                                    birthdayToEdit = birthday
-                                    showAddBirthday.toggle()
-                                } label: {
-                                    Label("Edit", systemImage: "pencil")
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 75) // Set consistent height
+                                    .background(Color(red: 154/255, green: 125/255, blue: 255/255)) // Card color
+                                    .cornerRadius(12)
+                                    .shadow(radius: 5)
                                 }
                             }
                         }
-                        .onDelete(perform: deleteBirthday)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
                     }
-                    .listStyle(PlainListStyle())
                 }
 
                 // Add Birthday button
@@ -94,7 +118,7 @@ struct BirthdayListView: View {
             }
             .navigationTitle("Birthdays")
             .navigationBarTitleDisplayMode(.inline)
-            
+
             .sheet(isPresented: $showAddBirthday) {
                 if let selectedBirthday = birthdayToEdit {
                     AddBirthdayView(onAddBirthday: { updatedBirthday in
@@ -115,11 +139,199 @@ struct BirthdayListView: View {
                 set: { if !$0 { errorMessage = "" }}
             )) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
-                
             }
         }
-        .background(Color.clear)
     }
+    
+    // Separate view for adding / editing a birthday
+    /*
+    struct AddBirthdayView: View {
+        @Environment(\.presentationMode) var presentationMode
+        var onAddBirthday: (Birthday) -> Void
+        var birthday: Birthday?
+
+        @State private var description: String = ""
+        @State private var date: Date = Date()
+
+        var body: some View {
+            ZStack {
+                Color(red: 154/255, green: 125/255, blue: 255/255) // Modal background color
+                    .edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: 20) {
+                    Text(birthday == nil ? "Add Birthday" : "Edit Birthday") // Dynamic title
+                        .font(.largeTitle)
+                        .foregroundColor(.white)
+
+                    // Input fields for birthday description and date
+                    TextField("Description", text: $description)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .foregroundColor(.black)
+
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+                        .datePickerStyle(GraphicalDatePickerStyle())
+                        .padding()
+                        .background(Color.white) // Ensuring the DatePicker is clickable
+                        .cornerRadius(8)
+
+                    // HStack for Cancel and Add/Update buttons
+                    HStack {
+                        // Cancel Button
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss() // Dismiss the modal
+                        }) {
+                            Text("Cancel")
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.red) // Color for the cancel button
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .shadow(radius: 5)
+                        .padding(.trailing) // Add space between buttons
+
+                        // Add/Update Birthday Button
+                        Button(action: {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "yyyy-MM-dd"
+                            let dateString = formatter.string(from: date)
+
+                            // Assuming Birthday is your model
+                            let userId = 1 // Replace this with your logic to get the actual user ID
+                            let newBirthday = Birthday(id: birthday?.id ?? 0, user: userId, description: description, date: dateString)
+
+                            onAddBirthday(newBirthday) // Trigger the callback
+                            presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
+                        }) {
+                            Text(birthday == nil ? "Add Birthday" : "Update Birthday")
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Same UI as main view button
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .shadow(radius: 5)
+                    }
+                    .padding(.horizontal)
+
+                    Spacer()
+                }
+                .padding()
+            }
+            .onAppear {
+                // Populate the fields if editing an existing birthday
+                if let birthday = birthday {
+                    description = birthday.description
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy-MM-dd"
+                    if let dateValue = formatter.date(from: birthday.date) {
+                        self.date = dateValue
+                    }
+                }
+            }
+        }
+    }
+*/
+    /* Add / edit modal */
+    struct AddBirthdayView: View {
+        @Environment(\.presentationMode) var presentationMode
+        @State private var description: String = ""
+        @State private var date: Date = Date() // Keeps date as Date type
+        var onAddBirthday: (Birthday) -> Void
+        var birthday: Birthday?
+
+        var body: some View {
+            NavigationView {
+                ZStack {
+                    // Set the modal background color
+                    Color(red: 154/255, green: 125/255, blue: 255/255)
+                        .edgesIgnoringSafeArea(.all) // Extend the color to fill the entire modal
+
+                    Form {
+                        Section(header: Text("Birthday Details").font(.headline).padding()) {
+                            HStack {
+                                Image(systemName: "person.fill") // Icon for the description field
+                                    .foregroundColor(.blue)
+                                TextField("Description", text: $description)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle()) // Round border style
+                                    .padding(5) // Add padding for better touch area
+                            }
+
+                            HStack {
+                                Image(systemName: "calendar") // Icon for the date picker
+                                    .foregroundColor(.blue)
+                                DatePicker("Date", selection: $date, displayedComponents: .date)
+                                    .datePickerStyle(GraphicalDatePickerStyle())
+                                    .labelsHidden() // Hides label for a cleaner look
+                            }
+                        }
+
+                        // HStack for Cancel and Add/Update buttons
+                        HStack {
+                            // Cancel Button
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss() // Dismiss the modal
+                            }) {
+                                Text("Cancel")
+                                    .frame(maxWidth: .infinity) // Make button full width
+                                    .padding()
+                                    .background(Color.red) // Customize cancel button color
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10) // Rounded corners
+                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Add shadow
+                            }
+                            .padding(.trailing) // Space between buttons
+
+                            // Add/Update Birthday Button
+                            Button(action: {
+                                let formatter = DateFormatter()
+                                formatter.dateFormat = "yyyy-MM-dd"
+                                let dateString = formatter.string(from: date)
+                                let newBirthday = Birthday(
+                                    id: birthday?.id ?? 0, // Use existing ID or default to 0
+                                    user: birthday?.user ?? 1, // Use existing user or default to 1
+                                    description: description,
+                                    date: dateString
+                                )
+                                onAddBirthday(newBirthday)
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                Text(birthday == nil ? "Add Birthday" : "Update Birthday")
+                                    .frame(maxWidth: .infinity) // Make button full width
+                                    .padding()
+                                    .background(Color.blue) // Customize button color
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10) // Rounded corners
+                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Add shadow
+                            }
+                        }
+                        .padding(.top)
+                    }
+                    .navigationTitle(birthday == nil ? "Add Birthday" : "Edit Birthday")
+                    .navigationBarItems(trailing: Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    })
+                }
+            }
+            .onAppear {
+                if let birthday = birthday {
+                    description = birthday.description
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy-MM-dd"
+                    if let date = formatter.date(from: birthday.date) {
+                        self.date = date
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 
     
