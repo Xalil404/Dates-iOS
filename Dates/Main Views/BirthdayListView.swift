@@ -143,7 +143,8 @@ struct BirthdayListView: View {
         }
     }
     
-    // Separate view for adding / editing a birthday
+    
+    /* Add / edit Birthday modal */
     /*
     struct AddBirthdayView: View {
         @Environment(\.presentationMode) var presentationMode
@@ -163,13 +164,14 @@ struct BirthdayListView: View {
                         .font(.largeTitle)
                         .foregroundColor(.white)
 
-                    // Input fields for birthday description and date
+                    // Input field for birthday description
                     TextField("Description", text: $description)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(8)
                         .foregroundColor(.black)
 
+                    // Date picker without calendar icon
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
                         .padding()
@@ -210,7 +212,7 @@ struct BirthdayListView: View {
                                 .fontWeight(.bold)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Same UI as main view button
+                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Customize button color
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
@@ -236,99 +238,61 @@ struct BirthdayListView: View {
         }
     }
 */
-    /* Add / edit modal */
+    
+/*
     struct AddBirthdayView: View {
         @Environment(\.presentationMode) var presentationMode
         @State private var description: String = ""
-        @State private var date: Date = Date() // Keeps date as Date type
+        @State private var date: Date = Date()
         var onAddBirthday: (Birthday) -> Void
         var birthday: Birthday?
+        var currentUserId: Int // Pass the logged-in user's ID
 
         var body: some View {
             NavigationView {
-                ZStack {
-                    // Set the modal background color
-                    Color(red: 154/255, green: 125/255, blue: 255/255)
-                        .edgesIgnoringSafeArea(.all) // Extend the color to fill the entire modal
-
-                    Form {
-                        Section(header: Text("Birthday Details").font(.headline).padding()) {
-                            HStack {
-                                Image(systemName: "person.fill") // Icon for the description field
-                                    .foregroundColor(.blue)
-                                TextField("Description", text: $description)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle()) // Round border style
-                                    .padding(5) // Add padding for better touch area
-                            }
-
-                            HStack {
-                                Image(systemName: "calendar") // Icon for the date picker
-                                    .foregroundColor(.blue)
-                                DatePicker("Date", selection: $date, displayedComponents: .date)
-                                    .datePickerStyle(GraphicalDatePickerStyle())
-                                    .labelsHidden() // Hides label for a cleaner look
-                            }
-                        }
-
-                        // HStack for Cancel and Add/Update buttons
-                        HStack {
-                            // Cancel Button
-                            Button(action: {
-                                presentationMode.wrappedValue.dismiss() // Dismiss the modal
-                            }) {
-                                Text("Cancel")
-                                    .frame(maxWidth: .infinity) // Make button full width
-                                    .padding()
-                                    .background(Color.red) // Customize cancel button color
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10) // Rounded corners
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Add shadow
-                            }
-                            .padding(.trailing) // Space between buttons
-
-                            // Add/Update Birthday Button
-                            Button(action: {
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "yyyy-MM-dd"
-                                let dateString = formatter.string(from: date)
-                                let newBirthday = Birthday(
-                                    id: birthday?.id ?? 0, // Use existing ID or default to 0
-                                    user: birthday?.user ?? 1, // Use existing user or default to 1
-                                    description: description,
-                                    date: dateString
-                                )
-                                onAddBirthday(newBirthday)
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Text(birthday == nil ? "Add Birthday" : "Update Birthday")
-                                    .frame(maxWidth: .infinity) // Make button full width
-                                    .padding()
-                                    .background(Color.blue) // Customize button color
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10) // Rounded corners
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Add shadow
-                            }
-                        }
-                        .padding(.top)
+                Form {
+                    Section(header: Text("Birthday Details")) {
+                        TextField("Description", text: $description)
+                        DatePicker("Date", selection: $date, displayedComponents: .date)
+                            .datePickerStyle(GraphicalDatePickerStyle())
                     }
-                    .navigationTitle(birthday == nil ? "Add Birthday" : "Edit Birthday")
-                    .navigationBarItems(trailing: Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
-                    })
+
+                    Button(birthday == nil ? "Add Birthday" : "Update Birthday") {
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "yyyy-MM-dd"
+                        let dateString = formatter.string(from: date)
+
+                        // Use the correct user ID when creating or updating a birthday
+                        let newBirthday = Birthday(
+                            id: birthday?.id ?? 0,
+                            user: currentUserId, // Use the current user's ID
+                            description: description,
+                            date: dateString
+                        )
+
+                        onAddBirthday(newBirthday) // Trigger the callback
+                        presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
+                    }
                 }
+                .navigationTitle(birthday == nil ? "Add Birthday" : "Edit Birthday")
+                .navigationBarItems(trailing: Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                })
             }
             .onAppear {
+                // Populate the fields if editing an existing birthday
                 if let birthday = birthday {
                     description = birthday.description
                     let formatter = DateFormatter()
                     formatter.dateFormat = "yyyy-MM-dd"
-                    if let date = formatter.date(from: birthday.date) {
-                        self.date = date
+                    if let dateValue = formatter.date(from: birthday.date) {
+                        self.date = dateValue
                     }
                 }
             }
         }
     }
+*/
 
 
 

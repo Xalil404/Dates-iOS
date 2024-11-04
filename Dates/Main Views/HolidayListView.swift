@@ -19,14 +19,14 @@ struct HolidayListView: View {
     @State private var showAddHoliday = false
     @State private var holidayToEdit: UserHoliday? = nil
     @State private var errorMessage: String = ""
-
+    
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
                 // Set the background color to match the anniversaries screen
                 Color(red: 248/255, green: 247/255, blue: 245/255)
                     .edgesIgnoringSafeArea(.all) // Fill the entire screen
-
+                
                 // Check if the list is empty
                 if holidays.isEmpty {
                     // Empty state UI
@@ -148,8 +148,81 @@ struct HolidayListView: View {
             }
         }
     }
+    
 
 
+   
+    /* Add / edit Holiday modal */
+    /*
+    struct AddHolidayView: View {
+        @Environment(\.presentationMode) var presentationMode
+        @State private var description: String = ""
+        @State private var month: Int = 1
+        @State private var day: Int = 1
+        var onAddHoliday: (Holiday) -> Void
+        var holiday: Holiday?
+        var userId: Int // Pass the user ID to assign to each holiday
+
+        init(onAddHoliday: @escaping (Holiday) -> Void, holiday: Holiday? = nil, userId: Int) {
+            self.onAddHoliday = onAddHoliday
+            self.holiday = holiday
+            self.userId = userId
+            _description = State(initialValue: holiday?.description ?? "")
+            _month = State(initialValue: holiday?.month ?? 1)
+            _day = State(initialValue: holiday?.day ?? 1)
+        }
+
+        var body: some View {
+            NavigationView {
+                Form {
+                    Section(header: Text("Holiday Details")) {
+                        TextField("Description", text: $description)
+                        
+                        HStack {
+                            Picker("Month", selection: $month) {
+                                ForEach(1...12, id: \.self) { month in
+                                    Text("\(month)").tag(month)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+
+                            Picker("Day", selection: $day) {
+                                ForEach(1...31, id: \.self) { day in
+                                    Text("\(day)").tag(day)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                        }
+                    }
+                }
+                .navigationTitle(holiday == nil ? "Add Holiday" : "Edit Holiday")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(holiday == nil ? "Add" : "Save") {
+                            if !description.isEmpty {
+                                let newHoliday = Holiday(
+                                    id: holiday?.id ?? Int.random(in: 1000...9999), // Generate a random ID if adding a new holiday
+                                    user: userId,
+                                    description: description,
+                                    month: month,
+                                    day: day
+                                )
+                                onAddHoliday(newHoliday)
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                        }
+                        .disabled(description.isEmpty)
+                    }
+                }
+            }
+        }
+    }
+*/
 
 
     /* Ui is above; below are the functions */

@@ -144,6 +144,99 @@ struct AnniversaryListView: View {
         }
     }
 
+    /* Add / edit Anniversary modal */
+    struct AddAnniversaryView: View {
+        @Environment(\.presentationMode) var presentationMode
+        var onAddAnniversary: (Anniversary) -> Void
+        var anniversary: Anniversary?
+
+        @State private var description: String = ""
+        @State private var date: Date = Date()
+
+        var body: some View {
+            ZStack {
+                Color(red: 154/255, green: 125/255, blue: 255/255) // Modal background color
+                    .edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: 20) {
+                    Text(anniversary == nil ? "Add Anniversary" : "Edit Anniversary") // Dynamic title
+                        .font(.largeTitle)
+                        .foregroundColor(.white)
+
+                    // Input field for anniversary description
+                    TextField("Description", text: $description)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .foregroundColor(.black)
+
+                    // Date picker without calendar icon
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+                        .datePickerStyle(GraphicalDatePickerStyle())
+                        .padding()
+                        .background(Color.white) // Ensuring the DatePicker is clickable
+                        .cornerRadius(8)
+
+                    // HStack for Cancel and Add/Update buttons
+                    HStack {
+                        // Cancel Button
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss() // Dismiss the modal
+                        }) {
+                            Text("Cancel")
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.red) // Color for the cancel button
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .shadow(radius: 5)
+                        .padding(.trailing) // Add space between buttons
+
+                        // Add/Update Anniversary Button
+                        Button(action: {
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "yyyy-MM-dd"
+                            let dateString = formatter.string(from: date)
+
+                            // Assuming Anniversary is your model
+                            let userId = 1 // Replace this with your logic to get the actual user ID
+                            let newAnniversary = Anniversary(id: anniversary?.id ?? 0, user: userId, description: description, date: dateString)
+
+                            onAddAnniversary(newAnniversary) // Trigger the callback
+                            presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
+                        }) {
+                            Text(anniversary == nil ? "Add Anniversary" : "Update Anniversary")
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Same UI as main view button
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .shadow(radius: 5)
+                    }
+                    .padding(.horizontal)
+
+                    Spacer()
+                }
+                .padding()
+            }
+            .onAppear {
+                // Populate the fields if editing an existing anniversary
+                if let anniversary = anniversary {
+                    description = anniversary.description
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy-MM-dd"
+                    if let dateValue = formatter.date(from: anniversary.date) {
+                        self.date = dateValue
+                    }
+                }
+            }
+        }
+    }
+
 
 
 
