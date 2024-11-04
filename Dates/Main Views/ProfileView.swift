@@ -80,6 +80,44 @@ struct ProfileView: View {
 
     
     /* UI is above; below are the functions */
+    /*
+    private func logout() {
+            guard let token = UserDefaults.standard.string(forKey: "authToken"),
+                  let url = URL(string: "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/auth/logout/") else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST" // Use POST for logout
+            request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
+
+            // Perform the logout request
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        errorMessage = error.localizedDescription
+                    }
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    DispatchQueue.main.async {
+                        errorMessage = "Logout failed. Please try again."
+                    }
+                    return
+                }
+
+                // Logout successful
+                DispatchQueue.main.async {
+                    // Clear the authentication token from UserDefaults
+                    UserDefaults.standard.removeObject(forKey: "authToken")
+
+                    // Reset the user data and navigate to the login screen
+                    user = nil
+                    isLoggedOut = true
+                }
+            }.resume()
+        }
+    */
     private func logout() {
         // Clear the authentication token from UserDefaults
         UserDefaults.standard.removeObject(forKey: "authToken")
@@ -88,6 +126,8 @@ struct ProfileView: View {
         user = nil
         isLoggedOut = true
     }
+     
+    
 
     private func fetchUserProfile() {
         guard let token = UserDefaults.standard.string(forKey: "authToken"),
@@ -123,7 +163,6 @@ struct ProfileView: View {
         }.resume()
     }
 }
-
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {

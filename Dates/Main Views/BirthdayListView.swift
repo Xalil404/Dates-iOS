@@ -144,15 +144,13 @@ struct BirthdayListView: View {
     }
     
     
-    /* Add / edit Birthday modal */
-    /*
+    /* Add & edit Birthday modal */
     struct AddBirthdayView: View {
         @Environment(\.presentationMode) var presentationMode
+        @State private var description: String = ""
+        @State private var date: Date = Date() // Change to Date type
         var onAddBirthday: (Birthday) -> Void
         var birthday: Birthday?
-
-        @State private var description: String = ""
-        @State private var date: Date = Date()
 
         var body: some View {
             ZStack {
@@ -165,7 +163,7 @@ struct BirthdayListView: View {
                         .foregroundColor(.white)
 
                     // Input field for birthday description
-                    TextField("Description", text: $description)
+                    TextField("What's the person's name?", text: $description)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(8)
@@ -201,14 +199,13 @@ struct BirthdayListView: View {
                             formatter.dateFormat = "yyyy-MM-dd"
                             let dateString = formatter.string(from: date)
 
-                            // Assuming Birthday is your model
-                            let userId = 1 // Replace this with your logic to get the actual user ID
-                            let newBirthday = Birthday(id: birthday?.id ?? 0, user: userId, description: description, date: dateString)
+                            // Create new Birthday object based on existing data or a new entry
+                            let newBirthday = Birthday(id: birthday?.id ?? 0, user: birthday?.user ?? 1, description: description, date: dateString)
 
                             onAddBirthday(newBirthday) // Trigger the callback
                             presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
                         }) {
-                            Text(birthday == nil ? "Add Birthday" : "Update Birthday")
+                            Text(birthday == nil ? "Add Birthday" : "Update B-Day")
                                 .fontWeight(.bold)
                                 .padding()
                                 .frame(maxWidth: .infinity)
@@ -237,67 +234,6 @@ struct BirthdayListView: View {
             }
         }
     }
-*/
-    
-/*
-    struct AddBirthdayView: View {
-        @Environment(\.presentationMode) var presentationMode
-        @State private var description: String = ""
-        @State private var date: Date = Date()
-        var onAddBirthday: (Birthday) -> Void
-        var birthday: Birthday?
-        var currentUserId: Int // Pass the logged-in user's ID
-
-        var body: some View {
-            NavigationView {
-                Form {
-                    Section(header: Text("Birthday Details")) {
-                        TextField("Description", text: $description)
-                        DatePicker("Date", selection: $date, displayedComponents: .date)
-                            .datePickerStyle(GraphicalDatePickerStyle())
-                    }
-
-                    Button(birthday == nil ? "Add Birthday" : "Update Birthday") {
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyy-MM-dd"
-                        let dateString = formatter.string(from: date)
-
-                        // Use the correct user ID when creating or updating a birthday
-                        let newBirthday = Birthday(
-                            id: birthday?.id ?? 0,
-                            user: currentUserId, // Use the current user's ID
-                            description: description,
-                            date: dateString
-                        )
-
-                        onAddBirthday(newBirthday) // Trigger the callback
-                        presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
-                    }
-                }
-                .navigationTitle(birthday == nil ? "Add Birthday" : "Edit Birthday")
-                .navigationBarItems(trailing: Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                })
-            }
-            .onAppear {
-                // Populate the fields if editing an existing birthday
-                if let birthday = birthday {
-                    description = birthday.description
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "yyyy-MM-dd"
-                    if let dateValue = formatter.date(from: birthday.date) {
-                        self.date = dateValue
-                    }
-                }
-            }
-        }
-    }
-*/
-
-
-
-
-
     
     /* Ui is above; below are the functions */
 
@@ -417,7 +353,8 @@ struct BirthdayListView: View {
         }
     }
 }
-
+/* Original default add & edit birthday modal */
+/*
 struct AddBirthdayView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var description: String = ""
@@ -460,6 +397,7 @@ struct AddBirthdayView: View {
         }
     }
 }
+*/
 
 struct Birthday: Identifiable, Codable {
     var id: Int
@@ -467,7 +405,6 @@ struct Birthday: Identifiable, Codable {
     var description: String
     var date: String // Use Date type if preferred
 }
-
 
 
 struct BirthdayListView_Previews: PreviewProvider {

@@ -144,18 +144,17 @@ struct AnniversaryListView: View {
         }
     }
 
-    /* Add / edit Anniversary modal */
+    /* Add & edit Anniversary modal */
     struct AddAnniversaryView: View {
         @Environment(\.presentationMode) var presentationMode
+        @State private var description: String = ""
+        @State private var date: Date = Date() // Change to Date type
         var onAddAnniversary: (Anniversary) -> Void
         var anniversary: Anniversary?
 
-        @State private var description: String = ""
-        @State private var date: Date = Date()
-
         var body: some View {
             ZStack {
-                Color(red: 154/255, green: 125/255, blue: 255/255) // Modal background color
+                Color(red: 242/255, green: 164/255, blue: 161/255) // Modal background color
                     .edgesIgnoringSafeArea(.all)
 
                 VStack(spacing: 20) {
@@ -164,7 +163,7 @@ struct AnniversaryListView: View {
                         .foregroundColor(.white)
 
                     // Input field for anniversary description
-                    TextField("Description", text: $description)
+                    TextField("What's the special occasion?", text: $description)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(8)
@@ -200,18 +199,17 @@ struct AnniversaryListView: View {
                             formatter.dateFormat = "yyyy-MM-dd"
                             let dateString = formatter.string(from: date)
 
-                            // Assuming Anniversary is your model
-                            let userId = 1 // Replace this with your logic to get the actual user ID
-                            let newAnniversary = Anniversary(id: anniversary?.id ?? 0, user: userId, description: description, date: dateString)
+                            // Create new Anniversary object based on existing data or a new entry
+                            let newAnniversary = Anniversary(id: anniversary?.id ?? 0, user: anniversary?.user ?? 1, description: description, date: dateString)
 
                             onAddAnniversary(newAnniversary) // Trigger the callback
                             presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
                         }) {
-                            Text(anniversary == nil ? "Add Anniversary" : "Update Anniversary")
+                            Text(anniversary == nil ? "Add Moment" : "Update Event")
                                 .fontWeight(.bold)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Same UI as main view button
+                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Customize button color
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
@@ -237,13 +235,7 @@ struct AnniversaryListView: View {
         }
     }
 
-
-
-
-
-
-
-/* Ui is above; below are the functions */
+     /* Ui is above; below are the functions */
     
     func fetchAnniversaries() {
         guard let token = UserDefaults.standard.string(forKey: "authToken"),
@@ -362,6 +354,7 @@ struct AnniversaryListView: View {
     }
 }
 
+/* Original add / edit modal
 struct AddAnniversaryView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var description: String = ""
@@ -404,6 +397,7 @@ struct AddAnniversaryView: View {
         }
     }
 }
+ */
 
 struct Anniversary: Identifiable, Codable {
     var id: Int

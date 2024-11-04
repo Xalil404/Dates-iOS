@@ -149,80 +149,118 @@ struct HolidayListView: View {
         }
     }
     
-
-
    
-    /* Add / edit Holiday modal */
-    /*
+    /* Add & edit Holiday modal */
+    
     struct AddHolidayView: View {
         @Environment(\.presentationMode) var presentationMode
         @State private var description: String = ""
-        @State private var month: Int = 1
-        @State private var day: Int = 1
-        var onAddHoliday: (Holiday) -> Void
-        var holiday: Holiday?
-        var userId: Int // Pass the user ID to assign to each holiday
-
-        init(onAddHoliday: @escaping (Holiday) -> Void, holiday: Holiday? = nil, userId: Int) {
-            self.onAddHoliday = onAddHoliday
-            self.holiday = holiday
-            self.userId = userId
-            _description = State(initialValue: holiday?.description ?? "")
-            _month = State(initialValue: holiday?.month ?? 1)
-            _day = State(initialValue: holiday?.day ?? 1)
-        }
+        @State private var month: Int = 1 // Default month
+        @State private var day: Int = 1 // Default day
+        var onAddHoliday: (UserHoliday) -> Void
+        var holiday: UserHoliday?
 
         var body: some View {
-            NavigationView {
-                Form {
-                    Section(header: Text("Holiday Details")) {
-                        TextField("Description", text: $description)
-                        
-                        HStack {
+            ZStack {
+                Color(red: 135/255, green: 206/255, blue: 235/255) // Modal background color
+                    .edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: 20) {
+                    Text(holiday == nil ? "Add Holiday" : "Edit Holiday") // Dynamic title
+                        .font(.largeTitle)
+                        .foregroundColor(.white)
+
+                    // Input field for holiday description
+                    TextField("What is the special day?", text: $description)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .foregroundColor(.black)
+
+                    // HStack for Month and Day Pickers
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Month") // Label for Month Picker
+                                .font(.headline)
+                                .foregroundColor(.white)
                             Picker("Month", selection: $month) {
-                                ForEach(1...12, id: \.self) { month in
+                                ForEach(1..<13) { month in
                                     Text("\(month)").tag(month)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
+                            .padding()
+                            .background(Color.white) // Ensuring the Picker is clickable
+                            .cornerRadius(8)
+                        }
+                        .padding(.trailing) // Space between pickers
 
+                        VStack(alignment: .leading) {
+                            Text("Day") // Label for Day Picker
+                                .font(.headline)
+                                .foregroundColor(.white)
                             Picker("Day", selection: $day) {
-                                ForEach(1...31, id: \.self) { day in
+                                ForEach(1..<32) { day in
                                     Text("\(day)").tag(day)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
+                            .padding()
+                            .background(Color.white) // Ensuring the Picker is clickable
+                            .cornerRadius(8)
                         }
                     }
+                    .padding(.horizontal)
+
+                    // HStack for Cancel and Add/Update buttons
+                    HStack {
+                        // Cancel Button
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss() // Dismiss the modal
+                        }) {
+                            Text("Cancel")
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.red) // Color for the cancel button
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .shadow(radius: 5)
+                        .padding(.trailing) // Add space between buttons
+
+                        // Add/Update Holiday Button
+                        Button(action: {
+                            let newHoliday = UserHoliday(id: holiday?.id ?? 0, user: holiday?.user ?? 1, description: description, month: month, day: day)
+                            onAddHoliday(newHoliday) // Trigger the callback
+                            presentationMode.wrappedValue.dismiss() // Dismiss the modal after adding/updating
+                        }) {
+                            Text(holiday == nil ? "Add Holiday" : "Update Holiday")
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(red: 232/255, green: 191/255, blue: 115/255)) // Customize button color
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .shadow(radius: 5)
+                    }
+                    .padding(.horizontal)
+
+                    Spacer()
                 }
-                .navigationTitle(holiday == nil ? "Add Holiday" : "Edit Holiday")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(holiday == nil ? "Add" : "Save") {
-                            if !description.isEmpty {
-                                let newHoliday = Holiday(
-                                    id: holiday?.id ?? Int.random(in: 1000...9999), // Generate a random ID if adding a new holiday
-                                    user: userId,
-                                    description: description,
-                                    month: month,
-                                    day: day
-                                )
-                                onAddHoliday(newHoliday)
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                        }
-                        .disabled(description.isEmpty)
-                    }
+                .padding()
+            }
+            .onAppear {
+                // Populate the fields if editing an existing holiday
+                if let holiday = holiday {
+                    description = holiday.description
+                    month = holiday.month
+                    day = holiday.day
                 }
             }
         }
     }
-*/
 
 
     /* Ui is above; below are the functions */
@@ -344,7 +382,7 @@ struct HolidayListView: View {
         }
     }
 }
-
+/* Original add & edit holiday modal
 struct AddHolidayView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var description: String = ""
@@ -392,6 +430,7 @@ struct AddHolidayView: View {
         }
     }
 }
+*/
 
 struct Holiday: Identifiable, Codable {
     var id: Int
