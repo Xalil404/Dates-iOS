@@ -8,6 +8,20 @@
 import SwiftUI
 
 struct MainTabView: View {
+    init() {
+            // Customize the appearance of the Tab Bar
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor.systemGray6 // Light gray background color
+            appearance.shadowImage = nil
+            appearance.shadowColor = nil
+            
+            UITabBar.appearance().standardAppearance = appearance
+            if #available(iOS 15.0, *) {
+                UITabBar.appearance().scrollEdgeAppearance = appearance
+            }
+        }
+    
     var body: some View {
         TabView {
             BirthdayListView()

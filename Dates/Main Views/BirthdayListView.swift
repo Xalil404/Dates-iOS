@@ -4,6 +4,7 @@
 //
 //  Created by TEST on 31.10.2024.
 //
+
 import SwiftUI
 
 struct BirthdayListView: View {
@@ -12,6 +13,7 @@ struct BirthdayListView: View {
     @State private var birthdayToEdit: Birthday? = nil
     @State private var errorMessage: String = ""
     
+ 
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
@@ -118,7 +120,7 @@ struct BirthdayListView: View {
             }
             .navigationTitle("Birthdays")
             .navigationBarTitleDisplayMode(.inline)
-
+            
             .sheet(isPresented: $showAddBirthday) {
                 if let selectedBirthday = birthdayToEdit {
                     AddBirthdayView(onAddBirthday: { updatedBirthday in

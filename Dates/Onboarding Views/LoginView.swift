@@ -149,11 +149,15 @@ struct LoginView: View {
             Spacer()
 
             // Navigation Link for CRUD Birthdays Screen
+                .fullScreenCover(isPresented: $isLoginSuccessful) {
+                            MainTabView()
+            /*
             NavigationLink(
                 destination: MainTabView(),
                 isActive: $isLoginSuccessful
             ) {
                 EmptyView()
+             */
             }
         }
         .background(Color(red: 248/255, green: 247/255, blue: 245/255))
