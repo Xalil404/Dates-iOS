@@ -7,6 +7,7 @@
 import GoogleSignIn
 import SwiftUI
 
+
 struct SignUpError: Identifiable {
     let id = UUID()
     let message: String
@@ -21,7 +22,7 @@ struct SignUpView: View {
     
     @State private var alertItem: SignUpError?
     @State private var isSignUpSuccessful: Bool = false
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -38,31 +39,31 @@ struct SignUpView: View {
                 }
                 .padding(.top, 50)
                 .padding(.horizontal)
-
+                
                 // Main Image
                 Image("signupImage")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 265, height: 265)
-
+                
                 // Title
                 Text("Sign Up")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.top)
-
+                
                 // Email Input Field
                 inputField(icon: "at", placeholder: "Email", text: $email)
-
+                
                 // Username Input Field
                 inputField(icon: "person", placeholder: "Username", text: $username)
-
+                
                 // Password Input Field
                 inputField(icon: "lock", placeholder: "Password", text: $password, isSecure: true)
-
+                
                 // Confirm Password Input Field
                 inputField(icon: "lock", placeholder: "Confirm Password", text: $confirmPassword, isSecure: true)
-
+                
                 // Continue Button
                 Button(action: {
                     signUp()
@@ -77,7 +78,7 @@ struct SignUpView: View {
                         .padding(.horizontal, 40)
                         .padding(.top, 20)
                 }
-
+                
                 // Divider
                 HStack {
                     Divider()
@@ -94,7 +95,7 @@ struct SignUpView: View {
                 }
                 .padding(.vertical)
                 .padding(.horizontal, 40)
-
+                
                 // Login with Google Button
                 Button(action: {
                     // Handle Google login action here
@@ -116,7 +117,7 @@ struct SignUpView: View {
                     .padding(.horizontal, 40)
                     .shadow(radius: 5)
                 }
-
+                
                 Spacer()
             }
             .background(Color(red: 248/255, green: 247/255, blue: 245/255))
@@ -125,7 +126,11 @@ struct SignUpView: View {
             .alert(item: $alertItem) { error in
                 Alert(title: Text("Error"), message: Text(error.message), dismissButton: .default(Text("OK")))
             }
-            .navigate(to: BirthdayListView(), when: $isSignUpSuccessful)
+            // Assuming you have a state variable to control the navigation
+            .fullScreenCover(isPresented: $isSignUpSuccessful) {
+                MainTabView() // Navigate to BirthdayListView on successful sign-in
+            }
+    
         }
     }
     
@@ -154,7 +159,7 @@ struct SignUpView: View {
         ]
         
         print("Preparing request with parameters: \(parameters)")
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -168,7 +173,7 @@ struct SignUpView: View {
             print("Error encoding parameters: \(error.localizedDescription)")
             return
         }
-
+        
         // Perform the request
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -186,12 +191,12 @@ struct SignUpView: View {
                 }
                 return
             }
-
+            
             // Debugging: Print response data
             if let responseString = String(data: data, encoding: .utf8) {
                 print("Response data: \(responseString)")
             }
-
+            
             // Check for successful registration
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 {
                 print("Registration successful.")
@@ -223,7 +228,7 @@ struct SignUpView: View {
                 Image(systemName: icon)
                     .foregroundColor(.gray)
                     .padding(.leading, 10)
-
+                
                 if isSecure {
                     SecureField(placeholder, text: text)
                         .padding(10)
@@ -234,30 +239,17 @@ struct SignUpView: View {
                         .background(Color.clear)
                 }
             }
-
+            
             Rectangle()
                 .frame(width: 280, height: 1)
                 .foregroundColor(Color.gray)
         }
         .padding(.horizontal)
     }
-}
-
-// Navigation Extension
-extension View {
-    func navigate<Destination: View>(to destination: Destination, when binding: Binding<Bool>) -> some View {
-        self.background(
-            NavigationLink(
-                destination: destination,
-                isActive: binding,
-                label: { EmptyView() }
-            )
-        )
-    }
-}
-
-
-func handleSignupButton() {
+    
+    
+    // Google Sign up
+    func handleSignupButton() {
         print("Sign in with Google clicked")
         
         if let rootViewController = getRootViewController() {
@@ -279,12 +271,67 @@ func handleSignupButton() {
                 print(result.user.profile?.email)
                 print(result.user.profile?.imageURL(withDimension: 200))
                 // You can do something with the result here, like navigating to another view or storing user info
+                // After successfully signing up, set isSignUpSuccessful to true
+                if let idToken = result.user.idToken?.tokenString {
+                    sendTokenToBackend(idToken: idToken)
+                
+                }
             }
         }
     }
+    
+    // Function to send token to backend
+        func sendTokenToBackend(idToken: String) {
+            guard let url = URL(string: API.backendURL) else { return }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            // Create JSON body with the token
+            let body: [String: Any] = ["token": idToken]
+            
+            do {
+                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+            } catch {
+                print("Failed to serialize JSON body: \(error.localizedDescription)")
+                return
+            }
+            
+            // Send the request to your backend
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error sending token: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let data = data else {
+                    print("No data received from backend")
+                    return
+                }
+                
+                do {
+                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                    if let dict = jsonResponse as? [String: Any], let token = dict["token"] as? String {
+                        // Successfully authenticated, save token and set login state
+                        UserDefaults.standard.set(token, forKey: "authToken")
+                        UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                        DispatchQueue.main.async {
+                            self.isSignUpSuccessful = true
+                        }
+                    } else {
+                        print("Invalid response from backend")
+                    }
+                } catch {
+                    print("Failed to parse response from backend: \(error.localizedDescription)")
+                }
+            }.resume()
+        }
+    
+    
+} // View officially ends here
 
 // Two functions for Google Sign in
-
 func getRootViewController() -> UIViewController? {
     guard let scene = UIApplication.shared.connectedScenes.first as?
             UIWindowScene,
