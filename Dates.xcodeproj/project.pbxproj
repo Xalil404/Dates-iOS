@@ -6,13 +6,35 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5234859D2CDA425000EB420F /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 5234859C2CDA425000EB420F /* GoogleSignIn */; };
+		5234859F2CDA425000EB420F /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5234859E2CDA425000EB420F /* GoogleSignInSwift */; };
+		6C058599F678872CA0EA1431 /* Pods_Dates.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0820B63CB4B7A01BD075C20A /* Pods_Dates.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		0820B63CB4B7A01BD075C20A /* Pods_Dates.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Dates.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2524A7DF834B14BF0825301C /* Pods-Dates.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Dates.release.xcconfig"; path = "Target Support Files/Pods-Dates/Pods-Dates.release.xcconfig"; sourceTree = "<group>"; };
 		52E85B052CD8E1700086731A /* Dates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dates.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3AC8620335299C3ECCE7148 /* Pods-Dates.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Dates.debug.xcconfig"; path = "Target Support Files/Pods-Dates/Pods-Dates.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5234859A2CDA402100EB420F /* Exceptions for "Dates" folder in "Dates" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5253D2142CD38E2500C25A2D /* Dates */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5253D2172CD38E2500C25A2D /* Dates */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5234859A2CDA402100EB420F /* Exceptions for "Dates" folder in "Dates" target */,
+			);
 			path = Dates;
 			sourceTree = "<group>";
 		};
@@ -23,6 +45,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5234859F2CDA425000EB420F /* GoogleSignInSwift in Frameworks */,
+				6C058599F678872CA0EA1431 /* Pods_Dates.framework in Frameworks */,
+				5234859D2CDA425000EB420F /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -34,7 +59,26 @@
 			children = (
 				5253D2172CD38E2500C25A2D /* Dates */,
 				52E85B052CD8E1700086731A /* Dates.app */,
+				79EC87F9F23D776D74C1D805 /* Pods */,
+				5A0E9B775C6E7406DFA3D835 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		5A0E9B775C6E7406DFA3D835 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0820B63CB4B7A01BD075C20A /* Pods_Dates.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		79EC87F9F23D776D74C1D805 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A3AC8620335299C3ECCE7148 /* Pods-Dates.debug.xcconfig */,
+				2524A7DF834B14BF0825301C /* Pods-Dates.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -44,9 +88,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5253D2282CD38E2800C25A2D /* Build configuration list for PBXNativeTarget "Dates" */;
 			buildPhases = (
+				BF67F26F2E9CB8C4E56C01D9 /* [CP] Check Pods Manifest.lock */,
 				5253D2112CD38E2500C25A2D /* Sources */,
 				5253D2122CD38E2500C25A2D /* Frameworks */,
 				5253D2132CD38E2500C25A2D /* Resources */,
+				7CD3C3DA05B54C23DC9FE061 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -56,8 +102,6 @@
 				5253D2172CD38E2500C25A2D /* Dates */,
 			);
 			name = Dates;
-			packageProductDependencies = (
-			);
 			productName = Dates;
 			productReference = 52E85B052CD8E1700086731A /* Dates.app */;
 			productType = "com.apple.product-type.application";
@@ -86,6 +130,9 @@
 			);
 			mainGroup = 5253D20C2CD38E2500C25A2D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5234859B2CDA425000EB420F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5253D20C2CD38E2500C25A2D;
 			projectDirPath = "";
@@ -105,6 +152,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7CD3C3DA05B54C23DC9FE061 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Dates/Pods-Dates-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Dates/Pods-Dates-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Dates/Pods-Dates-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BF67F26F2E9CB8C4E56C01D9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Dates-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5253D2112CD38E2500C25A2D /* Sources */ = {
@@ -238,6 +327,7 @@
 		};
 		5253D2292CD38E2800C25A2D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A3AC8620335299C3ECCE7148 /* Pods-Dates.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -247,6 +337,7 @@
 				DEVELOPMENT_TEAM = TGGQFAW4Y5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Dates/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -267,6 +358,7 @@
 		};
 		5253D22A2CD38E2800C25A2D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2524A7DF834B14BF0825301C /* Pods-Dates.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -276,6 +368,7 @@
 				DEVELOPMENT_TEAM = TGGQFAW4Y5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Dates/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -316,6 +409,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5234859B2CDA425000EB420F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5234859C2CDA425000EB420F /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5234859B2CDA425000EB420F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		5234859E2CDA425000EB420F /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5234859B2CDA425000EB420F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5253D20D2CD38E2500C25A2D /* Project object */;
 }

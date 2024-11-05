@@ -4,7 +4,7 @@
 //
 //  Created by TEST on 31.10.2024.
 //
-
+import GoogleSignIn
 import SwiftUI
 
 struct SignUpError: Identifiable {
@@ -98,6 +98,7 @@ struct SignUpView: View {
                 // Login with Google Button
                 Button(action: {
                     // Handle Google login action here
+                    handleSignupButton() // Call the function to handle sign-in
                 }) {
                     HStack {
                         Image("googleIcon")
@@ -255,8 +256,68 @@ extension View {
     }
 }
 
+
+func handleSignupButton() {
+        print("Sign in with Google clicked")
+        
+        if let rootViewController = getRootViewController() {
+            GIDSignIn.sharedInstance.signIn(
+                withPresenting: rootViewController
+            ) { result, error in
+                if let error = error {
+                    print("Error signing in: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let result = result else {
+                    print("No result")
+                    return
+                }
+                
+                // Successful sign-in
+                print(result.user.profile?.name)
+                print(result.user.profile?.email)
+                print(result.user.profile?.imageURL(withDimension: 200))
+                // You can do something with the result here, like navigating to another view or storing user info
+            }
+        }
+    }
+
+// Two functions for Google Sign in
+
+func getRootViewController() -> UIViewController? {
+    guard let scene = UIApplication.shared.connectedScenes.first as?
+            UIWindowScene,
+          let rootViewController = scene.windows.first?.rootViewController else {
+        return nil
+    }
+    return getVisibleViewController (from: rootViewController)
+}
+
+
+
+private func getVisibleViewController (from vc: UIViewController) ->
+UIViewController {
+    if let nav = vc as? UINavigationController {
+        return getVisibleViewController(from: nav.visibleViewController!)
+    }
+    if let tab = vc as? UITabBarController {
+        return getVisibleViewController(from: tab.selectedViewController!)
+    }
+    if let presented = vc.presentedViewController {
+        return getVisibleViewController (from: presented)
+    }
+    return vc
+}
+
+
 struct SignUpView_Previews: PreviewProvider {
     static var previews: some View {
         SignUpView()
     }
 }
+
+
+
+
+
