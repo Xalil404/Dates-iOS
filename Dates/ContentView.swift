@@ -4,13 +4,14 @@
 //
 //  Created by TEST on 31.10.2024.
 //
+
 import SwiftUI
 import CoreData
 
 struct ContentView: View {
     @State private var showSplashScreen = true
     @State private var isLoggedOut = false // State to track the user's login status
-    @State private var hasSeenOnboardingView = UserDefaults.standard.bool(forKey: "hasSeenOnboardingView") // Track onboarding status
+     @State private var hasSeenOnboardingView = UserDefaults.standard.bool(forKey: "hasSeenOnboardingView") // Track onboarding status
     
     var body: some View {
         if showSplashScreen {
@@ -26,7 +27,7 @@ struct ContentView: View {
         } else {
             // Determine the appropriate view based on user login status and onboarding completion
             if isLoggedOut {
-                LoginView() // Show login view when the user is logged out
+                WelcomeView() // Show login view when the user is logged out
                     .onAppear {
                         // Reset the onboarding status when showing login view
                         hasSeenOnboardingView = false

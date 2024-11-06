@@ -164,12 +164,17 @@ struct LoginView: View {
         .background(Color(red: 248/255, green: 247/255, blue: 245/255))
         .edgesIgnoringSafeArea(.all)
         .navigationBarBackButtonHidden(true)
+        
         .onAppear {
-            // Check if user is already logged in
+            // Ensure we don't automatically login without credentials
             if UserDefaults.standard.bool(forKey: "isLoggedIn") {
-                self.isLoginSuccessful = true
+                // Only set to true if there's a valid token saved, not just based on the isLoggedIn flag
+                if UserDefaults.standard.string(forKey: "authToken") != nil {
+                    self.isLoginSuccessful = true
+                }
             }
         }
+        
     }
     
     /* Ui is above; below are the functions */

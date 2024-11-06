@@ -12,6 +12,7 @@ struct AnniversaryListView: View {
     @State private var showAddAnniversary = false
     @State private var anniversaryToEdit: Anniversary? = nil
     @State private var errorMessage: String = ""
+    
 
     var body: some View {
         NavigationView {

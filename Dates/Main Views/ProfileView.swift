@@ -12,7 +12,7 @@ struct ProfileView: View {
     @State private var user: User? // State variable to hold user data
     @State private var isLoading = true // State variable to track loading state
     @State private var errorMessage: String = "" // State variable to hold error messages
-
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -61,9 +61,11 @@ struct ProfileView: View {
             .padding()
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
+            
             .fullScreenCover(isPresented: $isLoggedOut) {
-                LoginView() // Replace with your actual login view
+                WelcomeView() // Replace with your actual login view
             }
+            
             .onAppear {
                 fetchUserProfile() // Fetch user data when the view appears
             }
@@ -75,7 +77,7 @@ struct ProfileView: View {
             }
         }
     }
-
+    
     private func logout() {
         // Clear the authentication token from UserDefaults
         UserDefaults.standard.removeObject(forKey: "authToken")
@@ -89,6 +91,7 @@ struct ProfileView: View {
         // Trigger the fullScreenCover to show the LoginView
         isLoggedOut = true
     }
+    
 
     private func fetchUserProfile() {
         guard let token = UserDefaults.standard.string(forKey: "authToken"),
