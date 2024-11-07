@@ -4,6 +4,12 @@
 //
 //  Created by TEST on 31.10.2024.
 //
+//  SignUpView.swift
+//  Dates
+//
+//  Created by TEST on 31.10.2024.
+//
+
 import GoogleSignIn
 import SwiftUI
 
@@ -22,6 +28,11 @@ struct SignUpView: View {
     
     @State private var alertItem: SignUpError?
     @State private var isSignUpSuccessful: Bool = false
+    
+    @State private var errorMessage: String = ""
+    @State private var isLoading: Bool = false
+    @State private var user: User? = nil
+
     
     var body: some View {
         NavigationStack {
@@ -134,6 +145,199 @@ struct SignUpView: View {
         }
     }
     
+    
+
+
+    
+    /*Account created in db & accesses the app */
+    private func signUp() {
+        print("Sign-up process started.")
+        
+        // Validate input
+        guard password == confirmPassword else {
+            alertItem = SignUpError(message: "Passwords do not match.")
+            print("Passwords do not match.")
+            return
+        }
+        
+        // Prepare the request
+        guard let url = URL(string: "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/auth/registration/") else {
+            alertItem = SignUpError(message: "Invalid URL.")
+            print("Invalid URL.")
+            return
+        }
+        
+        let parameters: [String: Any] = [
+            "username": username,
+            "email": email,
+            "password1": password,
+            "password2": confirmPassword
+        ]
+        
+        print("Preparing request with parameters: \(parameters)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Encode parameters as JSON
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
+            print("Request body: \(String(data: request.httpBody!, encoding: .utf8) ?? "nil")")
+        } catch {
+            alertItem = SignUpError(message: "Error encoding parameters: \(error.localizedDescription)")
+            print("Error encoding parameters: \(error.localizedDescription)")
+            return
+        }
+        
+        // Perform the request
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    self.alertItem = SignUpError(message: "Network error: \(error.localizedDescription)")
+                    print("Network error: \(error.localizedDescription)")
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    self.alertItem = SignUpError(message: "No data received.")
+                    print("No data received.")
+                }
+                return
+            }
+            
+            // Debugging: Print response data
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Response data: \(responseString)")
+            }
+            
+            // Check for successful registration
+            if let httpResponse = response as? HTTPURLResponse {
+                print("HTTP Response Status Code: \(httpResponse.statusCode)")
+                
+                if httpResponse.statusCode == 201 {
+                    print("Registration successful.")
+                    DispatchQueue.main.async {
+                        self.isSignUpSuccessful = true
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.alertItem = SignUpError(message: "Registration successful, but with unexpected status code: \(httpResponse.statusCode). Proceeding to the app.")
+                        print("Registration successful, but with unexpected status code: \(httpResponse.statusCode). Proceeding to the app.")
+                        self.isSignUpSuccessful = true
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.alertItem = SignUpError(message: "Unexpected error. Please try again.")
+                    print("Unexpected error. No detailed response.")
+                }
+            }
+        }.resume()
+    }
+
+
+
+    
+    /* User registers and goes in app but no account created
+    private func signUp() {
+        print("Sign-up process started.")
+        
+        // Validate input
+        guard password == confirmPassword else {
+            alertItem = SignUpError(message: "Passwords do not match.")
+            print("Passwords do not match.")
+            return
+        }
+        
+        // Prepare the request
+        guard let url = URL(string: "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/auth/registration/") else {
+            alertItem = SignUpError(message: "Invalid URL.")
+            print("Invalid URL.")
+            return
+        }
+        
+        let parameters: [String: Any] = [
+            "username": username,
+            "email": email,
+            "password1": password,
+            "password2": confirmPassword
+        ]
+        
+        print("Preparing request with parameters: \(parameters)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Encode parameters as JSON
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
+            print("Request body: \(String(data: request.httpBody!, encoding: .utf8) ?? "nil")")
+        } catch {
+            alertItem = SignUpError(message: "Error encoding parameters: \(error.localizedDescription)")
+            print("Error encoding parameters: \(error.localizedDescription)")
+            return
+        }
+        
+        // Perform the request
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    self.alertItem = SignUpError(message: "Network error: \(error.localizedDescription)")
+                    print("Network error: \(error.localizedDescription)")
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    self.alertItem = SignUpError(message: "No data received.")
+                    print("No data received.")
+                }
+                return
+            }
+            
+            // Debugging: Print response details
+            if let httpResponse = response as? HTTPURLResponse {
+                print("HTTP Response Status Code: \(httpResponse.statusCode)")
+                
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("Response data: \(responseString)")
+                }
+                
+                // Check for successful registration
+                if httpResponse.statusCode == 201 || httpResponse.statusCode == 204 {
+                    print("Registration successful.")
+                    DispatchQueue.main.async {
+                        self.isSignUpSuccessful = true
+                    }
+                } else {
+                    // Parse error message
+                    if let responseData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let detail = responseData["detail"] as? String {
+                        DispatchQueue.main.async {
+                            self.alertItem = SignUpError(message: detail)
+                            print("Error from server: \(detail)")
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.alertItem = SignUpError(message: "Registration failed with status code: \(httpResponse.statusCode). Please try again.")
+                            print("Registration failed with status code: \(httpResponse.statusCode).")
+                        }
+                    }
+                }
+            }
+        }.resume()
+    }
+*/
+    
+   
+   
+    /* User account created but can't access app */
+    /*
     private func signUp() {
         print("Sign-up process started.")
         
@@ -220,6 +424,7 @@ struct SignUpView: View {
             }
         }.resume()
     }
+         */
     
     // Input Field Function
     private func inputField(icon: String, placeholder: String, text: Binding<String>, isSecure: Bool = false) -> some View {
@@ -280,7 +485,7 @@ struct SignUpView: View {
         }
     }
     
-    // Function to send token to backend
+    // Function to send token to backend 
         func sendTokenToBackend(idToken: String) {
             guard let url = URL(string: API.backendURL) else { return }
             
@@ -356,6 +561,7 @@ UIViewController {
     }
     return vc
 }
+
 
 
 struct SignUpView_Previews: PreviewProvider {
