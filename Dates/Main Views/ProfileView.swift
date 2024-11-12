@@ -50,6 +50,28 @@ struct ProfileView: View {
                     }
                     .padding(.top, 10) // Optional: Add some top padding if needed
                     .padding(.horizontal) // Add horizontal padding
+                    
+                    // Information and button to close account
+                    VStack(alignment: .center) {
+                        Text("To close your account and delete your data and profile, submit an account closure request.")
+                            .font(.body)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, 20)
+                                            
+                                            // Button to navigate to the URL
+                                            Button(action: {
+                                                if let url = URL(string: "https://crud-frontend-steel.vercel.app/contact") {
+                                                    UIApplication.shared.open(url)
+                                                }
+                                            }) {
+                                                Text("Press here to delete your account")
+                                                    .foregroundColor(.blue) // Customize the button text color
+                                                    .font(.body)
+                                            }
+                                            .padding(.top, 5)
+                                        }
+                                        .padding(.top, 30) // Add top padding to separate from the logout button
+                    
                 } else {
                     Text("Failed to load user information")
                         .font(.subheadline)
