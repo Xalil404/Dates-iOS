@@ -5,6 +5,7 @@
 //  Created by TEST on 31.10.2024.
 //
 
+import AuthenticationServices
 import GoogleSignIn
 import SwiftUI
 
@@ -21,6 +22,8 @@ struct LoginView: View {
     @State private var loginError: String?
     @State private var isLoading: Bool = false
     @State private var isLoginSuccessful: Bool = false
+    
+    @State private var appleSignInError: String?
     
     var body: some View {
         VStack {
@@ -42,13 +45,13 @@ struct LoginView: View {
             Image("loginImage")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 350, height: 350)
+                .frame(width: 300, height: 300)
             
             // Title
             Text("Login")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-                .padding(.top)
+            
             
             // Email Input Field
             VStack(spacing: 0) {
@@ -132,6 +135,36 @@ struct LoginView: View {
             .padding(.vertical)
             .padding(.horizontal, 40)
             
+            // Login with Apple Button
+            SignInWithAppleButton(
+                .signIn,
+                onRequest: { request in
+                    request.requestedScopes = [.fullName, .email]
+                },
+                onCompletion: { result in
+                    switch result {
+                    case .success(let authorization):
+                        handleAppleSignIn(authorization: authorization)
+                    case .failure(let error):
+                        appleSignInError = "Apple Sign-In failed: \(error.localizedDescription)"
+                    }
+                }
+            )
+            .signInWithAppleButtonStyle(.black)
+            .frame(height: 55)
+            .cornerRadius(30)
+            .padding(.horizontal, 40)
+            .padding(.bottom, 10)
+            .shadow(radius: 5)
+            
+            // Display error message for Apple Sign-In if any
+            if let error = appleSignInError {
+                Text(error)
+                    .foregroundColor(.red)
+                    .padding(.top, 10)
+            }
+            
+            
             // Login with Google Button
             Button(action: {
                 // Handle Google login action here
@@ -142,7 +175,7 @@ struct LoginView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                    Text("Login with Google")
+                    Text("Sign in with Google")
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                 }
@@ -276,8 +309,8 @@ struct LoginView: View {
                 // You can do something with the result here, like navigating to another view or storing user info
                 // After successfully logging in with Google, set isLoginSuccessful to true
                 // Retrieve the ID token and send it to your backend
-                                if let idToken = result.user.idToken?.tokenString {
-                                    sendTokenToBackend(idToken: idToken)
+                if let idToken = result.user.idToken?.tokenString {
+                    sendTokenToBackend(idToken: idToken)
                 }
             }
         }
@@ -285,53 +318,174 @@ struct LoginView: View {
     
     
     // Function to send token to backend
-        func sendTokenToBackend(idToken: String) {
-            guard let url = URL(string: API.backendURL) else { return }
-            
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            
-            // Create JSON body with the token
-            let body: [String: Any] = ["token": idToken]
-            
-            do {
-                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-            } catch {
-                print("Failed to serialize JSON body: \(error.localizedDescription)")
+    func sendTokenToBackend(idToken: String) {
+        guard let url = URL(string: API.backendURL) else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Create JSON body with the token
+        let body: [String: Any] = ["token": idToken]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            print("Failed to serialize JSON body: \(error.localizedDescription)")
+            return
+        }
+        
+        // Send the request to your backend
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error sending token: \(error.localizedDescription)")
                 return
             }
             
-            // Send the request to your backend
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("Error sending token: \(error.localizedDescription)")
-                    return
-                }
-                
-                guard let data = data else {
-                    print("No data received from backend")
-                    return
-                }
-                
-                do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    if let dict = jsonResponse as? [String: Any], let token = dict["token"] as? String {
-                        // Successfully authenticated, save token and set login state
-                        UserDefaults.standard.set(token, forKey: "authToken")
-                        UserDefaults.standard.set(true, forKey: "isLoggedIn")
-                        DispatchQueue.main.async {
-                            self.isLoginSuccessful = true
-                        }
-                    } else {
-                        print("Invalid response from backend")
+            guard let data = data else {
+                print("No data received from backend")
+                return
+            }
+            
+            do {
+                let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                if let dict = jsonResponse as? [String: Any], let token = dict["token"] as? String {
+                    // Successfully authenticated, save token and set login state
+                    UserDefaults.standard.set(token, forKey: "authToken")
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                    DispatchQueue.main.async {
+                        self.isLoginSuccessful = true
                     }
-                } catch {
-                    print("Failed to parse response from backend: \(error.localizedDescription)")
+                } else {
+                    print("Invalid response from backend")
                 }
-            }.resume()
-        }
+            } catch {
+                print("Failed to parse response from backend: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
     
+    /*
+     // Function to login with Apple without a backend
+     func handleAppleSignIn(authorization: ASAuthorization) {
+     if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+     // Extract user data
+     let userID = appleIDCredential.user
+     let fullName = appleIDCredential.fullName
+     let email = appleIDCredential.email
+     
+     // Save user data in UserDefaults or send it to your backend
+     UserDefaults.standard.set(userID, forKey: "appleUserID")
+     UserDefaults.standard.set(email, forKey: "appleEmail")
+     
+     // Mark login as successful
+     self.isLoginSuccessful = true
+     }
+     }
+     */
+    
+    // Function to handle Apple sign-in with a backend
+    func handleAppleSignIn(authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            
+            // Extract user data
+            let userID = appleIDCredential.user
+            let fullName = appleIDCredential.fullName
+            let email = appleIDCredential.email
+            
+            // Log details for debugging
+            print("User ID: \(userID)")
+            print("Full Name: \(fullName?.givenName ?? "N/A") \(fullName?.familyName ?? "N/A")")
+            print("Email: \(email ?? "N/A")")
+            
+            // Retrieve the identity token
+            guard let identityToken = appleIDCredential.identityToken,
+                  let tokenString = String(data: identityToken, encoding: .utf8) else {
+                print("Failed to retrieve Apple ID Token")
+                return
+            }
+            
+            // Log the token for debugging
+            print("Apple ID Token: \(tokenString)")
+            
+            // Prepare data to send to the backend
+            let appleData: [String: Any] = [
+                "apple_token": tokenString,
+                "user_id": userID,
+                "full_name": "\(fullName?.givenName ?? "") \(fullName?.familyName ?? "")",
+                "email": email ?? ""
+            ]
+            
+            // Send the user data to your backend for authentication
+            sendAppleDataToBackend(appleData: appleData) { result in
+                switch result {
+                case .success(let token):
+                    // Successfully authenticated, save token and set login state
+                    UserDefaults.standard.set(token, forKey: "authToken")
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                    // Use `self` directly here since `LoginView` is not a class
+                    DispatchQueue.main.async {
+                        self.isLoginSuccessful = true
+                    }
+                case .failure(let error):
+                    // Handle error
+                    print("Apple sign-in failed with error: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+
+    // Function to send Apple Sign-In data to backend
+    func sendAppleDataToBackend(appleData: [String: Any], completion: @escaping (Result<String, Error>) -> Void) {
+        guard let url = URL(string: "https://crud-backend-for-react-841cbc3a6949.herokuapp.com/api/auth/apple/mobile/") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: appleData, options: [])
+        } catch {
+            completion(.failure(error))
+            return
+        }
+        
+        // Send the request to the backend
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: 0, userInfo: nil)))
+                return
+            }
+            
+            // Parse the response
+            do {
+                if let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    if let token = dict["token"] as? String {
+                        completion(.success(token))
+                    } else if let errorMessage = dict["error"] as? String {
+                        // Handling a potential error message from the backend
+                        completion(.failure(NSError(domain: errorMessage, code: 0, userInfo: nil)))
+                    } else {
+                        completion(.failure(NSError(domain: "Unexpected response format", code: 0, userInfo: nil)))
+                    }
+                } else {
+                    completion(.failure(NSError(domain: "Invalid JSON structure", code: 0, userInfo: nil)))
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+
 }  // View officially ends here
 
 
