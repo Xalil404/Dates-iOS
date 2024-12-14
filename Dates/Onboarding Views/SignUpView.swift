@@ -189,6 +189,31 @@ struct SignUpView: View {
     private func signUp() {
         print("Sign-up process started.")
         
+        // Validate that no fields are empty
+                guard !username.isEmpty else {
+                        alertItem = SignUpError(message: "Username cannot be empty.")
+                        print("Username cannot be empty.")
+                        return
+                    }
+                    
+                    guard !email.isEmpty else {
+                        alertItem = SignUpError(message: "Email cannot be empty.")
+                        print("Email cannot be empty.")
+                        return
+                    }
+                    
+                    guard !password.isEmpty else {
+                        alertItem = SignUpError(message: "Password cannot be empty.")
+                        print("Password cannot be empty.")
+                        return
+                    }
+                    
+                    guard !confirmPassword.isEmpty else {
+                        alertItem = SignUpError(message: "Please confirm your password.")
+                        print("Please confirm your password.")
+                        return
+                    }
+        
         // Validate input
         guard password == confirmPassword else {
             alertItem = SignUpError(message: "Passwords do not match.")
