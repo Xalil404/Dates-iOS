@@ -10,6 +10,9 @@ import SwiftUI
 
 struct WelcomeView: View {
     
+    // Detect the current color scheme (light or dark)
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         
         NavigationView { // Wrap in NavigationView
@@ -22,6 +25,7 @@ struct WelcomeView: View {
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
+                    .foregroundColor(colorScheme == .dark ? .black : .black) // Dynamic text color
                 
                 Image("welcomeImage")
                     .resizable()

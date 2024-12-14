@@ -5,6 +5,9 @@
 import SwiftUI
 
 struct SplashScreen: View {
+    // Detect the current color scheme (light or dark)
+            @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         VStack {
             Spacer()
@@ -25,6 +28,7 @@ struct SplashScreen: View {
                 Text("Welcome to Dates")
                     .font(.title)
                     .fontWeight(.bold) // Optional styling
+                    .foregroundColor(colorScheme == .dark ? .black : .black) // Adjust text color
             }
             .padding(.top, 40) // Padding to adjust the position
 
