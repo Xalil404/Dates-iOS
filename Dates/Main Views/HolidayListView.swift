@@ -125,8 +125,16 @@ struct HolidayListView: View {
                 }
                 .shadow(radius: 5)
             }
-            .navigationTitle("Holidays")
-            .navigationBarTitleDisplayMode(.inline)
+            //.navigationTitle("Holidays")
+            //.navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Holidays")
+                        .font(.headline) // Customize the font as needed
+                        .foregroundColor(.black) // Ensure the text is black in all modes
+                }
+            }
+
             .sheet(isPresented: $showAddHoliday) {
                 if let selectedHoliday = holidayToEdit {
                     AddHolidayView(onAddHoliday: { updatedHoliday in
@@ -160,6 +168,8 @@ struct HolidayListView: View {
         @State private var day: Int = 1 // Default day
         var onAddHoliday: (UserHoliday) -> Void
         var holiday: UserHoliday?
+        
+        @Environment(\.colorScheme) var colorScheme
 
         var body: some View {
             ZStack {
@@ -174,9 +184,11 @@ struct HolidayListView: View {
                     // Input field for holiday description
                     TextField("What is the special day?", text: $description)
                         .padding()
-                        .background(Color.white)
+                        //.background(Color.white)
+                        .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
                         .cornerRadius(8)
-                        .foregroundColor(.black)
+                        //.foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? .white : .black)
 
                     // HStack for Month and Day Pickers
                     HStack {

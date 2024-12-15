@@ -120,8 +120,16 @@ struct AnniversaryListView: View {
                 }
                 .shadow(radius: 5)
             }
-            .navigationTitle("Anniversaries")
-            .navigationBarTitleDisplayMode(.inline)
+            //.navigationTitle("Anniversaries")
+            //.navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Anniversaries")
+                        .font(.headline) // Customize the font as needed
+                        .foregroundColor(.black) // Ensure the text is black in all modes
+                }
+            }
+            
             .sheet(isPresented: $showAddAnniversary) {
                 if let selectedAnniversary = anniversaryToEdit {
                     AddAnniversaryView(onAddAnniversary: { updatedAnniversary in
@@ -152,6 +160,8 @@ struct AnniversaryListView: View {
         @State private var date: Date = Date() // Change to Date type
         var onAddAnniversary: (Anniversary) -> Void
         var anniversary: Anniversary?
+        
+        @Environment(\.colorScheme) var colorScheme
 
         var body: some View {
             ZStack {
@@ -166,15 +176,18 @@ struct AnniversaryListView: View {
                     // Input field for anniversary description
                     TextField("What's the special occasion?", text: $description)
                         .padding()
-                        .background(Color.white)
+                        //.background(Color.white)
+                        .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white)
                         .cornerRadius(8)
-                        .foregroundColor(.black)
+                        //.foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? .white : .black)
 
                     // Date picker without calendar icon
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
                         .padding()
-                        .background(Color.white) // Ensuring the DatePicker is clickable
+                        //.background(Color.white) // Ensuring the DatePicker is clickable
+                        .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white) // Dynamic background
                         .cornerRadius(8)
 
                     // HStack for Cancel and Add/Update buttons

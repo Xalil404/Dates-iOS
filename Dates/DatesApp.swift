@@ -11,6 +11,7 @@ import SwiftUI
 struct DatesApp: App {
     let persistenceController = PersistenceController.shared
 
+
     var body: some Scene {
         WindowGroup {
             ContentView()

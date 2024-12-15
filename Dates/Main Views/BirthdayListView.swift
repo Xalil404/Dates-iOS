@@ -13,7 +13,6 @@ struct BirthdayListView: View {
     @State private var birthdayToEdit: Birthday? = nil
     @State private var errorMessage: String = ""
     
-    
  
     var body: some View {
         NavigationView {
@@ -119,9 +118,16 @@ struct BirthdayListView: View {
                 }
                 .shadow(radius: 5)
             }
-            .navigationTitle("Birthdays")
-            .navigationBarTitleDisplayMode(.inline)
-            
+            //.navigationTitle("Birthdays")
+            //.navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Birthdays")
+                        .font(.headline) // Customize the font as needed
+                        .foregroundColor(.black) // Ensure the text is black in all modes
+                }
+            }
+                        
             .sheet(isPresented: $showAddBirthday) {
                 if let selectedBirthday = birthdayToEdit {
                     AddBirthdayView(onAddBirthday: { updatedBirthday in
@@ -146,6 +152,7 @@ struct BirthdayListView: View {
         }
     }
     
+
     
     /* Add & edit Birthday modal */
     struct AddBirthdayView: View {
@@ -154,6 +161,8 @@ struct BirthdayListView: View {
         @State private var date: Date = Date() // Change to Date type
         var onAddBirthday: (Birthday) -> Void
         var birthday: Birthday?
+        
+        @Environment(\.colorScheme) var colorScheme
 
         var body: some View {
             ZStack {
@@ -168,15 +177,19 @@ struct BirthdayListView: View {
                     // Input field for birthday description
                     TextField("What's the person's name?", text: $description)
                         .padding()
-                        .background(Color.white)
+                        //.background(Color.white)
+                        .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.white)
                         .cornerRadius(8)
-                        .foregroundColor(.black)
+                        //.foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? .white : .black)
+                        
 
                     // Date picker without calendar icon
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
                         .padding()
-                        .background(Color.white) // Ensuring the DatePicker is clickable
+                        //.background(Color.white) // Ensuring the DatePicker is clickable
+                        .background(colorScheme == .dark ? Color.gray.opacity(0.2) : Color.white) // Dynamic background
                         .cornerRadius(8)
 
                     // HStack for Cancel and Add/Update buttons
